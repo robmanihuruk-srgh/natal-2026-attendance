@@ -34,12 +34,33 @@
             object-fit: cover; 
             border-radius: 14px;
             width: 100% !important;
-            /* Transform flip dihapus agar tampilan kamera di HP (kamera belakang) tidak terbalik, library akan mengaturnya otomatis */
+            max-height: 400px; /* Mencegah kamera laptop mengambil ukuran terlalu besar */
         }
+        
         /* Sembunyikan elemen UI default library yang mengganggu */
         #reader__dashboard_section_csr span, 
         #reader__dashboard_section_swaplink,
         #reader__filescan_input_label { display: none !important; } 
+        
+        /* Mempercantik Dropdown Pemilihan Kamera (Bisa pilih webcam laptop / kamera HP) */
+        #reader__camera_selection {
+            width: 85%;
+            padding: 10px 12px;
+            margin: 10px auto 0;
+            display: block;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            background-color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: #475569;
+            outline: none;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        #reader__camera_selection:focus { border-color: #059669; }
+
         #reader__dashboard_section_csr button {
             background-color: #059669; color: white; padding: 10px 20px;
             border-radius: 10px; border: none; font-weight: 700; margin-top: 15px; margin-bottom: 15px;
@@ -455,7 +476,7 @@
                 fps: 10, 
                 qrbox: { width: 250, height: 250 }, // Ukuran absolut aman: tidak akan crash meskipun webcam laptop beresolusi sangat rendah
                 rememberLastUsedCamera: true, // Otomatis mengingat apakah user terakhir pakai kamera depan/belakang
-                aspectRatio: 1.0, // Menjaga kestabilan rasio video di layar tablet/iPad
+                // aspectRatio: 1.0 TELAH DIHAPUS agar resolusi bawaan webcam Laptop (misal 16:9) bisa jalan mulus
                 supportedScanTypes: [0] // 0 = Eksklusif menggunakan Html5QrcodeScanType.SCAN_TYPE_CAMERA
             };
             
