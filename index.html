@@ -316,6 +316,7 @@
 
         const fmtDate = () => new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
         const getQR = (txt) => `https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=15&ecc=M&color=0f172a&bgcolor=ffffff&format=png&data=${encodeURIComponent(txt)}`;
+        const getTimeStr = (ts) => { if(!ts) return ''; const m = ts.match(/(\d{1,2}[:.]\d{2})/); return m ? m[1].replace('.',':') : ''; };
 
         // --- LISTENERS ---
         onValue(ref(db, 'participants'), s => {
@@ -413,11 +414,12 @@
                 beep('fail'); window.showScanResult(false, `⚠️ ${p.name} Sudah Check-in!`);
             } else {
                 beep('success');
+                const ts = fmtDate();
                 push(ref(db, 'attendance'), {
                     id: Date.now().toString(), participantId: p.id, name: p.name,
-                    classGrade: p.classGrade, sector: p.sector, timestamp: fmtDate()
+                    classGrade: p.classGrade, sector: p.sector, timestamp: ts
                 });
-                window.showScanResult(true, `✅ ${p.name} Berhasil Hadir!`);
+                window.showScanResult(true, `✅ ${p.name} Berhasil Hadir!<br><span class="text-xs font-normal opacity-90 mt-1 block">Jam Check-in: ${getTimeStr(ts)} WIB</span>`);
             }
         };
 
@@ -427,11 +429,12 @@
                 beep('fail'); window.showScanResult(false, `⚠️ ${p.name} Sudah Ambil!`, 'bg-amber-500');
             } else {
                 beep('success');
+                const ts = fmtDate();
                 push(ref(db, 'gifts'), {
                     id: Date.now().toString(), participantId: p.id, name: p.name,
-                    classGrade: p.classGrade, sector: p.sector, timestamp: fmtDate()
+                    classGrade: p.classGrade, sector: p.sector, timestamp: ts
                 });
-                window.showScanResult(true, `🎁 ${p.name} Dapat Hadiah!`, 'bg-red-600');
+                window.showScanResult(true, `🎁 ${p.name} Dapat Hadiah!<br><span class="text-xs font-normal opacity-90 mt-1 block">Jam Klaim: ${getTimeStr(ts)} WIB</span>`, 'bg-red-600');
             }
         };
 
@@ -513,11 +516,11 @@
                 const claimedGift = state.gifts.find(g => g.participantId === p.id);
                 
                 if (isGiftMode) {
-                    if (claimedGift) statusBadge = `<span class="text-red-600 font-bold text-xs bg-red-50 border border-red-100 px-3 py-1.5 rounded-lg flex items-center gap-1"><span class="text-sm">✓</span> Diambil</span>`;
+                    if (claimedGift) statusBadge = `<span class="text-red-600 font-bold text-xs bg-red-50 border border-red-100 px-3 py-1.5 rounded-lg flex items-center gap-1"><span class="text-sm">✓</span> Diambil <span class="opacity-70 ml-1 font-mono">${getTimeStr(claimedGift.timestamp)}</span></span>`;
                     else actionBtn = `<button onclick="window.secureProcess('${p.id}')" class="bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-700 active:scale-95 transition-transform flex items-center gap-1 shadow-sm shadow-red-200">🔒 Ambil</button>`;
                 } else {
                     const present = state.attendance.find(a => a.participantId === p.id);
-                    if (present) statusBadge = `<span class="text-emerald-600 font-bold text-xs bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-lg flex items-center gap-1"><span class="text-sm">✓</span> Hadir</span>`;
+                    if (present) statusBadge = `<span class="text-emerald-600 font-bold text-xs bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-lg flex items-center gap-1"><span class="text-sm">✓</span> Hadir <span class="opacity-70 ml-1 font-mono">${getTimeStr(present.timestamp)}</span></span>`;
                     else actionBtn = `<button onclick="window.secureProcess('${p.id}')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-700 active:scale-95 transition-transform flex items-center gap-1 shadow-sm shadow-blue-200">🔒 Check-in</button>`;
                 }
                 return `
@@ -582,8 +585,8 @@
                                     <div class="flex flex-wrap gap-2">
                                         <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-bold">${p.classGrade}</span>
                                         <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-bold">${p.sector}</span>
-                                        ${active ? '<span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-md font-bold">✓ Hadir</span>' : ''}
-                                        ${claimedGift ? '<span class="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md font-bold">🎁 Diambil</span>' : ''}
+                                        ${active ? `<span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-md font-bold">✓ Hadir ${getTimeStr(active.timestamp)}</span>` : ''}
+                                        ${claimedGift ? `<span class="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md font-bold">🎁 Diambil ${getTimeStr(claimedGift.timestamp)}</span>` : ''}
                                     </div>
                                 </div>
                             </div>`;
@@ -754,7 +757,7 @@
                                         <span class="bg-slate-100 px-2 py-0.5 rounded-md font-semibold">${item.classGrade}</span>
                                         <span class="bg-slate-100 px-2 py-0.5 rounded-md font-semibold">${item.sector}</span>
                                     </div>
-                                    <div class="text-[10px] text-slate-400 mt-2 font-mono flex items-center gap-1 font-medium">🕒 ${item.timestamp}</div>
+                                    <div class="text-[10px] text-slate-400 mt-2 font-mono flex items-center gap-1 font-medium">🕒 Jam ${isGiftView ? 'Klaim' : 'Check-in'}: ${item.timestamp}</div>
                                 </div>
                                 <div class="${isGiftView ? 'bg-red-50 text-red-600 border-red-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'} px-3 py-1.5 rounded-lg text-[10px] font-bold border flex items-center gap-1 shadow-sm">
                                     <span class="text-sm">✓</span> ${isGiftView ? 'DIAMBIL' : 'HADIR'}
