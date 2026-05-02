@@ -436,13 +436,27 @@
             state.scanner = new Html5QrcodeScanner("reader", config, false);
             
             state.scanner.render((decodedText) => {
-                if(state.scanner) state.scanner.pause(true); 
+                
+                // --- PERBAIKAN ERROR "CANNOT PAUSE" ---
+                // Dibungkus dalam try-catch. Jika scan menggunakan file gambar,
+                // perintah pause ini akan diabaikan tanpa membuat sistem menjadi error.
+                try {
+                    if(state.scanner) state.scanner.pause(true); 
+                } catch(err) {
+                    console.log("Mode Scan File aktif, abaikan jeda kamera.");
+                }
+                
                 const p = state.participants.find(x => x.qrCode === decodedText);
                 
+                // Proses absen berjalan normal
                 if(p) window.processScannedID(p.id); 
                 else { beep('fail'); window.showScanResult(false, "❌ QR Code Tidak Dikenali"); }
                 
-                setTimeout(() => { if(state.scanner) state.scanner.resume(); }, 2500);
+                setTimeout(() => { 
+                    try {
+                        if(state.scanner) state.scanner.resume(); 
+                    } catch(err) {}
+                }, 2500);
             }, (error) => {
                 // Jangan tampilkan error console agar tidak membanjiri log
             });
