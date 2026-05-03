@@ -485,9 +485,9 @@
                 
                 const p = state.participants.find(x => x.qrCode === decodedText);
                 
-                // Proses absen berjalan dengan proteksi password (Admin Only)
+                // Proses absen berjalan normal karena proteksi telah dipindahkan ke akses menu Tab
                 if(p) {
-                    window.secureProcess(p.id); 
+                    window.processScannedID(p.id); 
                 } else { 
                     beep('fail'); window.showScanResult(false, "❌ QR Code Tidak Dikenali"); 
                 }
@@ -567,6 +567,18 @@
         }
 
         window.setTab = (t) => {
+            // Tambahan Proteksi Password untuk akses masuk ke tab Scanner (Absen & Hadiah)
+            if (t === 'scan' || t === 'gift') {
+                // Hanya minta password jika user berpindah dari tab yang bukan scanner ke tab scanner
+                if (state.tab !== t) {
+                    const pass = prompt(`🔒 FITUR TERKUNCI\n\nMasukkan Password Panitia (Admin) untuk membuka Menu ${t === 'gift' ? 'Hadiah' : 'Absen'}:`);
+                    if (pass !== ADMIN_PASS) {
+                        if(pass !== null) alert("⛔ AKSES DITOLAK! Password salah.");
+                        return; // Batal pindah tab, diam di tab saat ini
+                    }
+                }
+            }
+
             if((state.tab === 'scan' || state.tab === 'gift') && (t !== 'scan' && t !== 'gift')) window.stopScanner();
             state.tab = t;
             
