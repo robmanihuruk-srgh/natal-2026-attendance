@@ -282,10 +282,11 @@
         const ADMIN_PASS = "ADMIN123";
 
         let state = {
-            participants: [], attendance: [], gifts: [],
+            participants: [], attendance: [], gifts: [], drawWinners: [], // Tambahan list drawWinners
             tab: 'register', dataViewMode: 'attendance', 
             scanner: null, tempData: null, searchTerm: '',
-            classFilter: 'Semua'
+            classFilter: 'Semua',
+            isAdminAuthenticated: false 
         };
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -311,6 +312,37 @@
         const getQR = (txt) => `https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=15&ecc=M&color=0f172a&bgcolor=ffffff&format=png&data=${encodeURIComponent(txt)}`;
         const getTimeStr = (ts) => { if(!ts) return ''; const m = ts.match(/(\d{1,2}[:.]\d{2})/); return m ? m[1].replace('.',':') : ''; };
 
+        // --- MENGGAMBAR DAFTAR PEMENANG UNDIAN KE LAYAR ---
+        window.renderDrawWinners = () => {
+            const container = document.getElementById('drawWinnersListContainer');
+            if (!container) return;
+            
+            if (state.drawWinners.length === 0) {
+                container.innerHTML = `<div class="text-center py-6 border-2 border-dashed border-purple-100 bg-purple-50 rounded-2xl text-purple-400 text-xs font-bold uppercase tracking-wider shadow-inner">Belum ada pemenang undian</div>`;
+                return;
+            }
+            
+            container.innerHTML = `
+                <h4 class="font-bold text-slate-700 mb-3 text-left text-sm flex items-center gap-2">
+                    <span class="text-purple-600 text-lg">🏆</span> Riwayat Pemenang
+                </h4>
+                <div class="space-y-2 max-h-60 overflow-y-auto pr-1 no-scrollbar">
+                    ${state.drawWinners.slice().reverse().map(w => `
+                        <div class="bg-white p-3.5 rounded-xl border border-slate-100 flex justify-between items-center shadow-sm hover:border-purple-200 transition-colors">
+                            <div class="text-left">
+                                <div class="font-bold text-slate-800 text-sm leading-tight">${w.name}</div>
+                                <div class="text-[10px] text-slate-500 mt-1 font-semibold">${w.classGrade} • ${w.sector}</div>
+                            </div>
+                            <div class="bg-purple-50 text-purple-700 px-3 py-1.5 rounded-lg text-xs font-black font-mono border border-purple-100 shadow-inner flex flex-col items-center">
+                                <span class="text-[8px] uppercase tracking-widest text-purple-400 leading-none mb-0.5">PIN</span>
+                                <span>${w.pin}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        };
+
         // --- LISTENERS ---
         onValue(ref(db, 'participants'), s => {
             state.participants = s.val() ? Object.values(s.val()) : [];
@@ -330,6 +362,12 @@
             state.gifts = s.val() ? Object.values(s.val()) : [];
             updateStats();
             if (state.tab === 'data' && state.dataViewMode === 'gifts') window.render();
+        });
+
+        // Tembahkan listener untuk door prize
+        onValue(ref(db, 'drawWinners'), s => {
+            state.drawWinners = s.val() ? Object.values(s.val()) : [];
+            if (state.tab === 'draw') window.renderDrawWinners();
         });
 
         function updateStats() {
@@ -440,9 +478,17 @@
         };
 
         window.secureProcess = (pid) => {
-            const pass = prompt("🔒 FITUR TERKUNCI\n\nMasukkan Password Panitia (Admin):");
-            if (pass === ADMIN_PASS) window.processScannedID(pid);
-            else { if(pass !== null) alert("⛔ AKSES DITOLAK! Password salah."); }
+            if (!state.isAdminAuthenticated) {
+                const pass = prompt("🔒 FITUR TERKUNCI\n\nMasukkan Password Panitia (Admin):");
+                if (pass === ADMIN_PASS) {
+                    state.isAdminAuthenticated = true; 
+                    window.processScannedID(pid);
+                } else { 
+                    if(pass !== null) alert("⛔ AKSES DITOLAK! Password salah."); 
+                }
+            } else {
+                window.processScannedID(pid);
+            }
         };
 
         window.processScannedID = (pid) => {
@@ -544,16 +590,15 @@
             return list.map(p => {
                 let statusBadge = ''; let actionBtn = '';
                 const claimedGift = state.gifts.find(g => g.participantId === p.id);
-                // Menambahkan 4 Digit ID Terakhir agar panitia tidak salah pilih jika ada nama ganda
                 const pinID = p.id ? p.id.slice(-4) : '0000';
                 
                 if (isGiftMode) {
                     if (claimedGift) statusBadge = `<span class="text-red-600 font-bold text-xs bg-red-50 border border-red-100 px-3 py-1.5 rounded-lg flex items-center gap-1"><span class="text-sm">✓</span> Diambil <span class="opacity-70 ml-1 font-mono">${getTimeStr(claimedGift.timestamp)}</span></span>`;
-                    else actionBtn = `<button onclick="window.secureProcess('${p.id}')" class="bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-700 active:scale-95 transition-transform flex items-center gap-1 shadow-sm shadow-red-200">🔒 Ambil</button>`;
+                    else actionBtn = `<button onclick="window.secureProcess('${p.id}')" class="bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-700 active:scale-95 transition-transform flex items-center gap-1 shadow-sm shadow-red-200">${state.isAdminAuthenticated ? '' : '🔒 '}Ambil</button>`;
                 } else {
                     const present = state.attendance.find(a => a.participantId === p.id);
                     if (present) statusBadge = `<span class="text-emerald-600 font-bold text-xs bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-lg flex items-center gap-1"><span class="text-sm">✓</span> Hadir <span class="opacity-70 ml-1 font-mono">${getTimeStr(present.timestamp)}</span></span>`;
-                    else actionBtn = `<button onclick="window.secureProcess('${p.id}')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-700 active:scale-95 transition-transform flex items-center gap-1 shadow-sm shadow-blue-200">🔒 Check-in</button>`;
+                    else actionBtn = `<button onclick="window.secureProcess('${p.id}')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-700 active:scale-95 transition-transform flex items-center gap-1 shadow-sm shadow-blue-200">${state.isAdminAuthenticated ? '' : '🔒 '}Check-in</button>`;
                 }
                 return `
                 <div class="flex items-center justify-between p-3.5 border-b border-slate-100 hover:bg-slate-50 transition-colors">
@@ -579,12 +624,14 @@
 
         window.setTab = (t) => {
             if (t === 'scan' || t === 'gift' || t === 'draw') {
-                if (state.tab !== t) {
+                if (state.tab !== t && !state.isAdminAuthenticated) {
                     const label = t === 'gift' ? 'Hadiah' : (t === 'draw' ? 'Undian Door Prize' : 'Absen');
                     const pass = prompt(`🔒 FITUR TERKUNCI\n\nMasukkan Password Panitia (Admin) untuk membuka Menu ${label}:`);
                     if (pass !== ADMIN_PASS) {
                         if(pass !== null) alert("⛔ AKSES DITOLAK! Password salah.");
                         return; 
+                    } else {
+                        state.isAdminAuthenticated = true;
                     }
                 }
             }
@@ -669,14 +716,16 @@
 
         window.spinDoorPrize = () => {
             const selectedClass = document.getElementById('drawClass').value;
-            let pool = state.attendance; 
+            
+            // LOGIKA UPDATE: Mengambil data absen (hadir), lalu MENGHILANGKAN orang yang sudah pernah menang undian sebelumnya
+            let pool = state.attendance.filter(a => !state.drawWinners.some(w => w.participantId === a.participantId));
             
             if (selectedClass !== 'Semua') {
                 pool = pool.filter(a => a.classGrade === selectedClass);
             }
             
             if (pool.length === 0) {
-                alert(`❌ Belum ada peserta yang HADIR (scan) untuk kelas: ${selectedClass}`);
+                alert(`❌ Belum ada peserta yang memenuhi syarat untuk kelas: ${selectedClass}\n(Atau semua peserta yang hadir di kelas ini sudah memenangkan hadiah)`);
                 return;
             }
 
@@ -708,13 +757,29 @@
                     beep('success');
                     
                     const winner = pool[Math.floor(Math.random() * pool.length)];
+                    
+                    // Mencari PIN Pemenang berdasarkan database peserta
+                    const participant = state.participants.find(p => p.id === winner.participantId);
+                    const pin = participant && participant.qrCode ? participant.qrCode.slice(-4) : '0000';
+
                     drawBox.classList.remove('bg-slate-800', 'border-slate-700');
                     drawBox.classList.add('bg-gradient-to-br', 'from-purple-600', 'to-indigo-700', 'border-purple-400', 'animate-pulse-soft');
                     
                     drawName.innerText = winner.name;
                     drawName.classList.replace('text-white', 'text-yellow-300');
-                    drawDetails.innerText = `🎉 KELAS ${winner.classGrade.toUpperCase()} | ${winner.sector} 🎉`;
+                    // Tampilkan PIN Pemenang di Kotak Undian
+                    drawDetails.innerHTML = `🎉 KELAS ${winner.classGrade.toUpperCase()} | ${winner.sector} 🎉<br><span class="inline-block mt-2 bg-purple-900 text-purple-200 px-3 py-1 rounded-lg border border-purple-500 font-mono text-xs tracking-widest">PIN TIKET: ${pin}</span>`;
                     
+                    // Simpan Pemenang ke Database agar tidak terpilih lagi
+                    push(ref(db, 'drawWinners'), {
+                        participantId: winner.participantId,
+                        name: winner.name,
+                        classGrade: winner.classGrade,
+                        sector: winner.sector,
+                        pin: pin,
+                        timestamp: fmtDate()
+                    });
+
                     btnDraw.disabled = false;
                     btnDraw.classList.remove('opacity-50', 'cursor-not-allowed');
                     btnDraw.innerHTML = '🎲 Acak Pemenang Lagi';
@@ -849,7 +914,7 @@
                     <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100">
                         <div class="flex items-center justify-between mb-4">
                             <div class="text-sm font-bold text-slate-700 flex items-center gap-2">
-                                <span class="text-slate-400">🔒</span> Pencarian Manual
+                                <span class="text-slate-400">${state.isAdminAuthenticated ? '✅' : '🔒'}</span> Pencarian Manual
                             </div>
                             <div class="text-[9px] font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded-md uppercase tracking-wider">Admin Only</div>
                         </div>
@@ -860,7 +925,6 @@
                     </div>
                 `;
             } 
-            // --- TAMPILAN TAB DOOR PRIZE ---
             else if (state.tab === 'draw') {
                 root.innerHTML = `
                     <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 relative overflow-hidden text-center">
@@ -896,9 +960,15 @@
                             <button id="btnDraw" onclick="window.spinDoorPrize()" class="w-full py-4 bg-purple-600 text-white font-bold rounded-2xl shadow-lg shadow-purple-200 hover:bg-purple-700 active:scale-95 transition-all flex justify-center items-center gap-2">
                                 🎲 Acak Pemenang Sekarang
                             </button>
+
+                            <div class="mt-8 border-t border-slate-100 pt-6">
+                                <div id="drawWinnersListContainer"></div>
+                            </div>
                         </div>
                     </div>
                 `;
+                // Panggil render list riwayat
+                setTimeout(() => { window.renderDrawWinners(); }, 50);
             } else if (state.tab === 'data') {
                 const isGiftView = state.dataViewMode === 'gifts';
                 const dataToShow = isGiftView ? state.gifts : state.attendance;
@@ -964,7 +1034,6 @@
             }
         };
 
-        // --- UPDATE FUNGSI PEMANGGILAN TIKET MENGGUNAKAN CANVAS ---
         window.showTicket = (n, cat, c, s, q) => {
             if (!n || !q) return;
             document.getElementById('ticName').innerText = n || "Peserta";
@@ -978,9 +1047,8 @@
 
             const qrUrl = getQR(q);
             const imgEl = document.getElementById('ticQR');
-            imgEl.src = qrUrl; // Gambar default sementara loading canvas
+            imgEl.src = qrUrl; 
 
-            // Proses Menggabungkan QR, Nama dan PIN ke dalam 1 file Canvas untuk didownload/disave
             fetch(qrUrl)
                 .then(res => res.blob())
                 .then(blob => {
@@ -989,29 +1057,22 @@
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         canvas.width = 600;
-                        canvas.height = 740; // Ditambah tingginya agar muat Teks
+                        canvas.height = 740; 
                         const ctx = canvas.getContext('2d');
                         
-                        // Isi latar belakang dengan warna putih
                         ctx.fillStyle = '#ffffff';
                         ctx.fillRect(0, 0, canvas.width, canvas.height);
-                        
-                        // Gambar/Tempel QR Codenya
                         ctx.drawImage(img, 0, 0, 600, 600);
                         
-                        // Tulis Teks PIN
                         ctx.fillStyle = '#0f172a';
                         ctx.font = 'bold 60px monospace';
                         ctx.textAlign = 'center';
                         ctx.fillText(`PIN: ${pinStr}`, 300, 660);
                         
-                        // Tulis Teks Nama dibawah PIN sebagai bukti tambahan
                         ctx.fillStyle = '#64748b';
                         ctx.font = 'bold 30px sans-serif';
-                        ctx.fillText((n || '').toUpperCase(), 300, 710, 560); // 560 adalah max-width agar teks yg panjang tidak terpotong
+                        ctx.fillText((n || '').toUpperCase(), 300, 710, 560);
                         
-                        // Masukkan gambar gabungan ini ke layar HP pengguna
-                        // Sekarang, jika peserta tekan tahan gambar untuk save, mereka akan men-save gambar komplit!
                         imgEl.src = canvas.toDataURL('image/png');
                         URL.revokeObjectURL(blobUrl);
                     };
@@ -1030,7 +1091,6 @@
             const filename = `Tiket_Natal_2026_${pName}.png`;
             
             try {
-                // Fetch akan berfungsi dengan baik karena ticQR.src sekarang berisi base64 Canvas (sudah termasuk PIN & Nama)
                 const response = await fetch(qrUrl);
                 const blob = await response.blob();
                 const blobUrl = URL.createObjectURL(blob);
@@ -1108,10 +1168,13 @@
         };
 
         window.exportData = (type) => {
-            const pass = prompt("🔒 FITUR TERKUNCI\n\nMasukkan Password Panitia (Admin):");
-            if (pass !== ADMIN_PASS) {
-                if(pass !== null) alert("⛔ AKSES DITOLAK! Password salah.");
-                return;
+            if (!state.isAdminAuthenticated) {
+                const pass = prompt("🔒 FITUR TERKUNCI\n\nMasukkan Password Panitia (Admin):");
+                if (pass !== ADMIN_PASS) {
+                    if(pass !== null) alert("⛔ AKSES DITOLAK! Password salah.");
+                    return;
+                }
+                state.isAdminAuthenticated = true;
             }
 
             let csv = "", filename = "", data = [];
@@ -1159,20 +1222,29 @@
         };
         
         window.triggerImport = () => {
-            const pass = prompt("🔒 FITUR TERKUNCI\n\nMasukkan Password Panitia (Admin):");
-            if (pass !== ADMIN_PASS) {
-                if(pass !== null) alert("⛔ AKSES DITOLAK! Password salah.");
-                return;
+            if (!state.isAdminAuthenticated) {
+                const pass = prompt("🔒 FITUR TERKUNCI\n\nMasukkan Password Panitia (Admin):");
+                if (pass !== ADMIN_PASS) {
+                    if(pass !== null) alert("⛔ AKSES DITOLAK! Password salah.");
+                    return;
+                }
+                state.isAdminAuthenticated = true;
             }
             document.getElementById('importInput').click();
         };
 
         window.resetData = () => {
-            if(prompt("Peringatan: Tindakan ini akan menghapus semua data peserta, absensi, dan hadiah!\n\nMasukkan Password Admin:") === ADMIN_PASS && confirm("Apakah Anda YAKIN ingin menghapus SEMUA data? Data yang terhapus tidak dapat dikembalikan.")) {
+            const warningText = "Peringatan: Tindakan ini akan menghapus semua data peserta, absensi, dan hadiah!\n\nMasukkan Password Admin:";
+            const pass = prompt(warningText);
+            
+            if(pass === ADMIN_PASS && confirm("Apakah Anda YAKIN ingin menghapus SEMUA data? Data yang terhapus tidak dapat dikembalikan.")) {
                 set(ref(db, 'participants'), null); 
                 set(ref(db, 'attendance'), null); 
                 set(ref(db, 'gifts'), null);
+                set(ref(db, 'drawWinners'), null); // Hapus list pemenang undian juga
                 alert("Database berhasil di-reset ke kondisi kosong.");
+            } else if (pass !== null && pass !== ADMIN_PASS) {
+                alert("⛔ AKSES DITOLAK! Password salah.");
             }
         };
 
