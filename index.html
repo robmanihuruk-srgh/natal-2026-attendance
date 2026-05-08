@@ -231,7 +231,13 @@
                         <div class="absolute inset-0 border-2 border-dashed border-red-200 rounded-2xl m-2 pointer-events-none"></div>
                         <img id="ticQR" src="" class="w-48 h-48 object-contain qr-code relative z-10" alt="QR Code Tiket" style="touch-action: pan-y;">
                     </div>
-                    <div class="text-[10px] text-slate-400 font-medium uppercase tracking-widest mt-2 mb-3">Scan for Attendance</div>
+                    
+                    <div class="mb-3 mt-1 inline-block bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 shadow-inner">
+                        <span class="text-[10px] text-slate-500 font-bold uppercase mr-1 tracking-wider">PIN TIKET:</span>
+                        <span id="ticPin" class="text-sm font-black text-slate-800 font-mono tracking-widest">0000</span>
+                    </div>
+                    
+                    <div class="text-[10px] text-slate-400 font-medium uppercase tracking-widest mb-3 block">Scan for Attendance</div>
                     
                     <div class="bg-blue-50 text-blue-700 text-[10px] px-4 py-2.5 rounded-xl flex items-start gap-2.5 text-left border border-blue-100 mx-auto max-w-[280px]">
                         <span class="text-sm leading-none mt-0.5">💡</span>
@@ -553,7 +559,7 @@
                 <div class="flex items-center justify-between p-3.5 border-b border-slate-100 hover:bg-slate-50 transition-colors">
                     <div>
                         <div class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-                            ${p.name} <span class="text-[10px] text-slate-400 font-mono bg-slate-100 px-1.5 py-0.5 rounded-md">ID:${pinID}</span>
+                            ${p.name} <span class="text-[10px] text-slate-500 font-mono bg-slate-200 border border-slate-300 px-1.5 py-0.5 rounded-md font-bold">PIN:${pinID}</span>
                         </div>
                         <div class="flex flex-wrap gap-2 mt-1.5">
                             ${p.category ? `<span class="text-[10px] bg-amber-50 text-amber-600 border border-amber-100 px-2 py-0.5 rounded-md font-bold">${p.category}</span>` : ''}
@@ -869,7 +875,7 @@
                             <div class="mb-6">
                                 <label class="block text-xs font-bold text-slate-500 mb-2 text-left ml-1">Filter Kelas Undian</label>
                                 <div class="relative">
-                                    <select id="drawClass" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 focus:outline-none focus:border-purple-500 appearance-none">
+                                    <select id="drawClass" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 focus:outline-none focus:border-purple-50 appearance-none">
                                         <option value="Semua">Semua Kelas (Bebas)</option>
                                         <option value="Pagi">Kelas Pagi</option>
                                         <option value="Daud">Kelas Daud</option>
@@ -960,12 +966,19 @@
             }
         };
 
+        // --- UPDATE MENAMPILKAN PIN DI TIKET POPUP ---
         window.showTicket = (n, cat, c, s, q) => {
             if (!n || !q) return;
             document.getElementById('ticName').innerText = n || "Peserta";
             document.getElementById('ticCategory').innerText = cat || "-";
             document.getElementById('ticClass').innerText = c || "-";
             document.getElementById('ticSector').innerText = s || "-";
+            
+            // Menampilkan PIN (4 Digit Terakhir dari string QR Code)
+            const pinStr = q.slice(-4);
+            const pinEl = document.getElementById('ticPin');
+            if(pinEl) pinEl.innerText = pinStr;
+
             const qrUrl = getQR(q);
             document.getElementById('ticQR').src = qrUrl;
             const t = document.getElementById('ticketModal');
@@ -1001,8 +1014,10 @@
             }
         };
 
+        // --- UPDATE MENAMPILKAN PIN DI TIKET CETAK (PRINT) ---
         window.printTicket = () => {
             const printWindow = window.open('', '_blank');
+            const pin = document.getElementById('ticPin').innerText; // Ambil nilai PIN
             printWindow.document.write(`
                 <html><head><title>Tiket Natal 2026</title>
                 <style>
@@ -1015,8 +1030,9 @@
                     .name { font-size: 22px; font-weight: bold; margin-bottom: 15px; color: #1e293b; }
                     .badges { margin-bottom: 20px; display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; }
                     .badge { display: inline-block; padding: 4px 12px; background: #f1f5f9; color: #475569; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #e2e8f0; }
-                    .qr-container { padding: 10px; border: 2px solid #f1f5f9; border-radius: 15px; display: inline-block; margin-bottom: 10px; }
+                    .qr-container { padding: 10px; border: 2px solid #f1f5f9; border-radius: 15px; display: inline-block; margin-bottom: 5px; }
                     .qr-code { width: 180px; height: 180px; }
+                    .pin-code { font-size: 16px; font-weight: 900; color: #0f172a; margin-bottom: 10px; font-family: monospace; letter-spacing: 2px; background: #f1f5f9; display: inline-block; padding: 4px 12px; border-radius: 8px; border: 1px solid #cbd5e1;}
                     .footer { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
                     .logos { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; }
                     .logos img { width: 45px; height: 45px; border-radius: 50%; background: white; padding: 3px; border: 2px solid rgba(255,255,255,0.5); }
@@ -1042,6 +1058,8 @@
                         <div class="qr-container">
                             <img src="${document.getElementById('ticQR').src}" class="qr-code">
                         </div>
+                        <br>
+                        <div class="pin-code">PIN: ${pin}</div>
                         <div class="footer">Scan For Attendance</div>
                     </div>
                 </div>
