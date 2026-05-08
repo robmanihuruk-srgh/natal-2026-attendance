@@ -90,7 +90,7 @@
         <div class="text-[20rem] -mr-20 mt-40">✨</div>
     </div>
 
-    <div id="app" class="relative z-10 w-full max-w-md mx-auto md:max-w-xl min-h-screen bg-slate-50 md:shadow-2xl md:my-6 md:rounded-[2.5rem] overflow-hidden flex flex-col border border-slate-200/50">
+    <div id="app" class="relative z-10 w-full max-w-md mx-auto md:max-w-4xl lg:max-w-6xl min-h-[100dvh] md:min-h-[calc(100vh-3rem)] bg-slate-50 md:shadow-2xl md:my-6 md:rounded-[2.5rem] overflow-hidden flex flex-col border border-slate-200/50">
         
         <div id="loading" class="absolute inset-0 z-[9999] bg-white flex flex-col justify-center items-center">
             <div class="w-20 h-20 border-4 border-red-100 border-t-red-600 rounded-full animate-spin mb-4"></div>
@@ -101,7 +101,7 @@
         <header class="bg-gradient-to-br from-red-800 via-red-700 to-red-900 text-white p-6 pb-20 shadow-lg relative overflow-hidden">
             <div class="absolute top-0 right-0 w-64 h-64 bg-red-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2"></div>
             
-            <div class="relative z-10 flex justify-between items-start mb-6">
+            <div class="relative z-10 flex justify-between items-start mb-6 max-w-5xl mx-auto w-full">
                 <div class="flex flex-col gap-2.5">
                     <div class="flex items-center gap-2">
                         <img src="LOGO-GKPS-ASLI-1.png" alt="Logo GKPS" class="w-10 h-10 bg-white rounded-full object-contain p-1 border-2 border-red-400/40 shadow-md" onerror="this.style.display='none'">
@@ -123,7 +123,7 @@
                 </div>
             </div>
             
-            <div class="relative z-10 flex gap-3 overflow-x-auto pb-2 no-scrollbar snap-x">
+            <div class="relative z-10 flex gap-3 overflow-x-auto md:justify-center pb-2 no-scrollbar snap-x max-w-5xl mx-auto w-full">
                 <div class="snap-center glass rounded-2xl p-4 flex-1 min-w-[100px] flex flex-col items-center justify-center relative overflow-hidden group">
                     <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
                     <div class="text-3xl font-black text-white" id="statRegistered">0</div>
@@ -140,33 +140,33 @@
             </div>
         </header>
 
-        <nav class="flex px-4 -mt-10 relative z-20 gap-2 overflow-x-auto pb-4 no-scrollbar snap-x">
-            <button onclick="window.setTab('register')" id="tab-register" class="snap-center flex-none min-w-[90px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-md">
+        <nav class="flex px-4 -mt-10 relative z-20 gap-2 overflow-x-auto md:justify-center pb-4 no-scrollbar snap-x max-w-5xl mx-auto w-full">
+            <button onclick="window.setTab('register')" id="tab-register" class="snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-md">
                 <span class="text-lg">📝</span><span>Daftar</span>
             </button>
-            <button onclick="window.setTab('find')" id="tab-find" class="snap-center flex-none min-w-[90px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-md">
+            <button onclick="window.setTab('find')" id="tab-find" class="snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-md">
                 <span class="text-lg">🎫</span><span>Tiket</span>
             </button>
-            <button onclick="window.setTab('scan')" id="tab-scan" class="snap-center flex-none min-w-[90px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-md">
+            <button onclick="window.setTab('scan')" id="tab-scan" class="snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-md">
                 <span class="text-lg">📷</span><span>Absen</span>
             </button>
-            <button onclick="window.setTab('gift')" id="tab-gift" class="snap-center flex-none min-w-[90px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-md">
+            <button onclick="window.setTab('gift')" id="tab-gift" class="snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-md">
                 <span class="text-lg">🎁</span><span>Hadiah</span>
             </button>
-            <button onclick="window.setTab('draw')" id="tab-draw" class="snap-center flex-none min-w-[90px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-md">
+            <button onclick="window.setTab('draw')" id="tab-draw" class="snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-md">
                 <span class="text-lg">🎰</span><span>Undian</span>
             </button>
-            <button onclick="window.setTab('data')" id="tab-data" class="snap-center flex-none min-w-[90px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-md">
+            <button onclick="window.setTab('data')" id="tab-data" class="snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-md">
                 <span class="text-lg">📊</span><span>Data</span>
             </button>
         </nav>
 
         <main class="flex-1 px-5 pt-2 pb-24 overflow-y-auto">
-            <div id="content-area" class="animate-fade-in"></div>
+            <div id="content-area" class="animate-fade-in flex flex-col items-center"></div>
         </main>
     </div>
 
-    <div id="confirmModal" class="fixed inset-0 z-[8000] flex items-center justify-center bg-slate-900/60 hidden backdrop-blur-sm transition-all duration-300 opacity-0">
+    <div id="confirmModal" class="fixed inset-0 z-[8000] flex items-center justify-center bg-slate-900/60 hidden backdrop-blur-sm transition-all duration-300 opacity-0 px-4">
         <div class="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl transform scale-95 transition-transform duration-300 m-4">
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-xl">✅</div>
@@ -282,7 +282,7 @@
         const ADMIN_PASS = "ADMIN123";
 
         let state = {
-            participants: [], attendance: [], gifts: [], drawWinners: [], // Tambahan list drawWinners
+            participants: [], attendance: [], gifts: [], drawWinners: [],
             tab: 'register', dataViewMode: 'attendance', 
             scanner: null, tempData: null, searchTerm: '',
             classFilter: 'Semua',
@@ -312,28 +312,27 @@
         const getQR = (txt) => `https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=15&ecc=M&color=0f172a&bgcolor=ffffff&format=png&data=${encodeURIComponent(txt)}`;
         const getTimeStr = (ts) => { if(!ts) return ''; const m = ts.match(/(\d{1,2}[:.]\d{2})/); return m ? m[1].replace('.',':') : ''; };
 
-        // --- MENGGAMBAR DAFTAR PEMENANG UNDIAN KE LAYAR ---
         window.renderDrawWinners = () => {
             const container = document.getElementById('drawWinnersListContainer');
             if (!container) return;
             
             if (state.drawWinners.length === 0) {
-                container.innerHTML = `<div class="text-center py-6 border-2 border-dashed border-purple-100 bg-purple-50 rounded-2xl text-purple-400 text-xs font-bold uppercase tracking-wider shadow-inner">Belum ada pemenang undian</div>`;
+                container.innerHTML = `<div class="text-center py-6 border-2 border-dashed border-purple-100 bg-purple-50 rounded-2xl text-purple-400 text-xs font-bold uppercase tracking-wider shadow-inner md:col-span-full">Belum ada pemenang undian</div>`;
                 return;
             }
             
             container.innerHTML = `
-                <h4 class="font-bold text-slate-700 mb-3 text-left text-sm flex items-center gap-2">
+                <h4 class="font-bold text-slate-700 mb-3 text-left text-sm flex items-center justify-center md:justify-start gap-2 w-full">
                     <span class="text-purple-600 text-lg">🏆</span> Riwayat Pemenang
                 </h4>
-                <div class="space-y-2 max-h-60 overflow-y-auto pr-1 no-scrollbar">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1 no-scrollbar w-full">
                     ${state.drawWinners.slice().reverse().map(w => `
                         <div class="bg-white p-3.5 rounded-xl border border-slate-100 flex justify-between items-center shadow-sm hover:border-purple-200 transition-colors">
                             <div class="text-left">
                                 <div class="font-bold text-slate-800 text-sm leading-tight">${w.name}</div>
                                 <div class="text-[10px] text-slate-500 mt-1 font-semibold">${w.classGrade} • ${w.sector}</div>
                             </div>
-                            <div class="bg-purple-50 text-purple-700 px-3 py-1.5 rounded-lg text-xs font-black font-mono border border-purple-100 shadow-inner flex flex-col items-center">
+                            <div class="bg-purple-50 text-purple-700 px-3 py-1.5 rounded-lg text-xs font-black font-mono border border-purple-100 shadow-inner flex flex-col items-center shrink-0 ml-2">
                                 <span class="text-[8px] uppercase tracking-widest text-purple-400 leading-none mb-0.5">PIN</span>
                                 <span>${w.pin}</span>
                             </div>
@@ -364,10 +363,10 @@
             if (state.tab === 'data' && state.dataViewMode === 'gifts') window.render();
         });
 
-        // Tembahkan listener untuk door prize
         onValue(ref(db, 'drawWinners'), s => {
             state.drawWinners = s.val() ? Object.values(s.val()) : [];
             if (state.tab === 'draw') window.renderDrawWinners();
+            if (state.tab === 'data' && state.dataViewMode === 'draws') window.render();
         });
 
         function updateStats() {
@@ -438,11 +437,11 @@
             } else if (foundList.length > 1) {
                 if(resultsContainer) {
                     let htmlContent = `
-                        <div class="p-4 bg-amber-50 border border-amber-200 rounded-2xl mt-2 animate-fade-in">
+                        <div class="p-4 bg-amber-50 border border-amber-200 rounded-2xl mt-4 animate-fade-in w-full">
                             <p class="text-[11px] text-amber-700 font-bold mb-3 flex items-start gap-1.5 leading-snug">
                                 <span>⚠️</span> Ditemukan ${foundList.length} orang dengan nama mirip di ${sector}. Silakan pilih tiket Anda:
                             </p>
-                            <div class="space-y-2">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                     `;
                     
                     foundList.forEach(p => {
@@ -456,11 +455,11 @@
                         htmlContent += `
                             <button onclick="window.showTicket('${safeName}', '${safeCategory}', '${safeClass}', '${safeSector}', '${qr}')" 
                                     class="w-full text-left bg-white p-3 border border-amber-100 rounded-xl shadow-sm hover:bg-amber-100 hover:border-amber-300 transition-colors flex justify-between items-center group">
-                                <div>
-                                    <div class="font-bold text-slate-800 text-sm group-hover:text-amber-800">${pName}</div>
+                                <div class="min-w-0 pr-2">
+                                    <div class="font-bold text-slate-800 text-sm group-hover:text-amber-800 truncate">${pName}</div>
                                     <div class="text-[10px] text-slate-500 mt-0.5 font-medium">Kat: ${safeCategory} | Kelas: ${safeClass}</div>
                                 </div>
-                                <div class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg text-[10px] font-bold border border-blue-100 shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-colors">Lihat 🎫</div>
+                                <div class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg text-[10px] font-bold border border-blue-100 shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-colors shrink-0">Lihat 🎫</div>
                             </button>
                         `;
                     });
@@ -528,7 +527,6 @@
             }
         };
 
-        // --- SCANNER SYSTEM ---
         window.initScanner = () => {
             if(state.scanner) return;
             
@@ -573,14 +571,13 @@
             }
         };
 
-        // --- HELPERS ---
         window.handleSearch = (el) => {
             state.searchTerm = el.value.toLowerCase();
             const container = document.getElementById('manual-list');
             if(!container) return;
             const filtered = state.participants.filter(p => p.name.toLowerCase().includes(state.searchTerm));
             if(filtered.length === 0) {
-                container.innerHTML = '<div class="text-center text-slate-400 py-6 text-sm">Nama tidak ditemukan</div>';
+                container.innerHTML = '<div class="text-center text-slate-400 py-6 text-sm md:col-span-full">Nama tidak ditemukan</div>';
                 return;
             }
             container.innerHTML = window.generateListHTML(filtered, state.tab === 'gift');
@@ -593,26 +590,28 @@
                 const pinID = p.id ? p.id.slice(-4) : '0000';
                 
                 if (isGiftMode) {
-                    if (claimedGift) statusBadge = `<span class="text-red-600 font-bold text-xs bg-red-50 border border-red-100 px-3 py-1.5 rounded-lg flex items-center gap-1"><span class="text-sm">✓</span> Diambil <span class="opacity-70 ml-1 font-mono">${getTimeStr(claimedGift.timestamp)}</span></span>`;
+                    if (claimedGift) statusBadge = `<span class="text-red-600 font-bold text-xs bg-red-50 border border-red-100 px-3 py-1.5 rounded-lg flex items-center gap-1"><span class="text-sm">✓</span> Diambil <span class="hidden md:inline opacity-70 ml-1 font-mono">${getTimeStr(claimedGift.timestamp)}</span></span>`;
                     else actionBtn = `<button onclick="window.secureProcess('${p.id}')" class="bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-700 active:scale-95 transition-transform flex items-center gap-1 shadow-sm shadow-red-200">${state.isAdminAuthenticated ? '' : '🔒 '}Ambil</button>`;
                 } else {
                     const present = state.attendance.find(a => a.participantId === p.id);
-                    if (present) statusBadge = `<span class="text-emerald-600 font-bold text-xs bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-lg flex items-center gap-1"><span class="text-sm">✓</span> Hadir <span class="opacity-70 ml-1 font-mono">${getTimeStr(present.timestamp)}</span></span>`;
+                    if (present) statusBadge = `<span class="text-emerald-600 font-bold text-xs bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-lg flex items-center gap-1"><span class="text-sm">✓</span> Hadir <span class="hidden md:inline opacity-70 ml-1 font-mono">${getTimeStr(present.timestamp)}</span></span>`;
                     else actionBtn = `<button onclick="window.secureProcess('${p.id}')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-700 active:scale-95 transition-transform flex items-center gap-1 shadow-sm shadow-blue-200">${state.isAdminAuthenticated ? '' : '🔒 '}Check-in</button>`;
                 }
                 return `
-                <div class="flex items-center justify-between p-3.5 border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                    <div>
-                        <div class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-                            ${p.name} <span class="text-[10px] text-slate-500 font-mono bg-slate-200 border border-slate-300 px-1.5 py-0.5 rounded-md font-bold">PIN:${pinID}</span>
+                <div class="flex items-center justify-between p-3.5 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors bg-white shadow-sm gap-2">
+                    <div class="flex-1 min-w-0">
+                        <div class="font-bold text-slate-800 text-sm flex items-center gap-1.5 truncate">
+                            ${p.name} <span class="text-[10px] text-slate-500 font-mono bg-slate-200 border border-slate-300 px-1 py-0.5 rounded-md font-bold shrink-0">PIN:${pinID}</span>
                         </div>
-                        <div class="flex flex-wrap gap-2 mt-1.5">
-                            ${p.category ? `<span class="text-[10px] bg-amber-50 text-amber-600 border border-amber-100 px-2 py-0.5 rounded-md font-bold">${p.category}</span>` : ''}
-                            <span class="text-[10px] bg-indigo-50 text-indigo-600 border border-indigo-100 px-2 py-0.5 rounded-md font-bold">${p.classGrade}</span>
-                            <span class="text-[10px] bg-sky-50 text-sky-600 border border-sky-100 px-2 py-0.5 rounded-md font-bold">${p.sector}</span>
+                        <div class="flex flex-wrap gap-1 mt-1.5">
+                            ${p.category ? `<span class="text-[9px] bg-amber-50 text-amber-600 border border-amber-100 px-1.5 py-0.5 rounded-md font-bold">${p.category}</span>` : ''}
+                            <span class="text-[9px] bg-indigo-50 text-indigo-600 border border-indigo-100 px-1.5 py-0.5 rounded-md font-bold">${p.classGrade}</span>
+                            <span class="text-[9px] bg-sky-50 text-sky-600 border border-sky-100 px-1.5 py-0.5 rounded-md font-bold">${p.sector}</span>
                         </div>
                     </div>
-                    ${statusBadge || actionBtn}
+                    <div class="shrink-0">
+                        ${statusBadge || actionBtn}
+                    </div>
                 </div>`;
             }).join('');
         };
@@ -646,9 +645,9 @@
                     let bgCol = 'bg-red-600';
                     if (t === 'draw') bgCol = 'bg-purple-600'; 
                     
-                    btn.className = `snap-center flex-none min-w-[90px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-lg ${bgCol} text-white -translate-y-1`;
+                    btn.className = `snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-lg ${bgCol} text-white -translate-y-1`;
                 } else {
-                    btn.className = "snap-center flex-none min-w-[90px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-sm bg-white text-slate-400 hover:text-slate-600 hover:bg-slate-50";
+                    btn.className = "snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-sm bg-white text-slate-400 hover:text-slate-600 hover:bg-slate-50";
                 }
             });
             window.render();
@@ -670,7 +669,7 @@
 
                 const filterOptions = ['Semua', 'Pagi', 'Daud', 'Daniel', 'Paulus', 'Ester', 'ASM', 'GSM', 'Orang Tua', 'Tamu Undangan'];
                 const filterHTML = `
-                    <div class="flex flex-wrap gap-2 mb-3 px-1">
+                    <div class="flex flex-wrap md:justify-center gap-2 mb-3 px-1">
                         ${filterOptions.map(f => `
                             <button onclick="window.setRegisterFilter('${f}')" class="px-4 py-1.5 rounded-full text-[11px] font-bold transition-all duration-200 ${state.classFilter === f ? 'bg-red-600 text-white shadow-md border-transparent' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'}">${f}</button>
                         `).join('')}
@@ -678,33 +677,33 @@
                 `;
 
                 if (state.participants.length === 0) {
-                    container.innerHTML = `<div class="text-center py-10 bg-white rounded-2xl border-2 border-dashed border-slate-200 mt-6"><div class="text-4xl mb-3 opacity-50">📝</div><div class="text-sm font-medium text-slate-500">Belum ada peserta terdaftar</div></div>`;
+                    container.innerHTML = `<div class="text-center py-10 bg-white rounded-2xl border-2 border-dashed border-slate-200 mt-6 max-w-5xl mx-auto w-full"><div class="text-4xl mb-3 opacity-50">📝</div><div class="text-sm font-medium text-slate-500">Belum ada peserta terdaftar</div></div>`;
                     return;
                 }
                 
                 container.innerHTML = `
-                    <div class="mt-6 mb-2">
+                    <div class="mt-6 mb-2 max-w-5xl mx-auto w-full">
                         <div class="flex justify-between items-center px-1 mb-3">
-                            <div>
+                            <div class="w-full text-center md:text-left">
                                 <h3 class="font-bold text-slate-800">Peserta Yang Terdaftar</h3>
                             </div>
                         </div>
                         ${filterHTML}
                     </div>
-                    <div class="space-y-3">
-                        ${filteredList.length === 0 ? `<div class="text-center py-8 text-sm font-medium text-slate-400 bg-white rounded-2xl border border-slate-100">Tidak ada pendaftar di kategori ini</div>` : filteredList.slice().reverse().slice(0, 50).map(p => {
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-w-5xl mx-auto w-full">
+                        ${filteredList.length === 0 ? `<div class="text-center py-8 text-sm font-medium text-slate-400 bg-white rounded-2xl border border-slate-100 md:col-span-full">Tidak ada pendaftar di kategori ini</div>` : filteredList.slice().reverse().slice(0, 50).map(p => {
                             const active = state.attendance.find(a => a.participantId === p.id);
                             const claimedGift = state.gifts.find(g => g.participantId === p.id);
                             return `
                             <div class="bg-white p-4 rounded-2xl shadow-sm flex justify-between items-center border border-slate-100 hover:shadow-md transition-all">
-                                <div class="flex-1">
-                                    <div class="font-bold text-slate-800 text-sm mb-1.5">${p.name}</div>
-                                    <div class="flex flex-wrap gap-2">
+                                <div class="flex-1 min-w-0 pr-2">
+                                    <div class="font-bold text-slate-800 text-sm mb-1.5 truncate">${p.name}</div>
+                                    <div class="flex flex-wrap gap-1.5">
                                         ${p.category ? `<span class="text-[10px] bg-amber-50 text-amber-600 px-2 py-0.5 rounded-md font-bold border border-amber-100">${p.category}</span>` : ''}
                                         <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-bold">${p.classGrade}</span>
                                         <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-bold">${p.sector}</span>
-                                        ${active ? `<span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-md font-bold">✓ Hadir ${getTimeStr(active.timestamp)}</span>` : ''}
-                                        ${claimedGift ? `<span class="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md font-bold">🎁 Diambil ${getTimeStr(claimedGift.timestamp)}</span>` : ''}
+                                        ${active ? `<span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-md font-bold shrink-0">✓ Hadir</span>` : ''}
+                                        ${claimedGift ? `<span class="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md font-bold shrink-0">🎁 Diambil</span>` : ''}
                                     </div>
                                 </div>
                             </div>`;
@@ -717,7 +716,6 @@
         window.spinDoorPrize = () => {
             const selectedClass = document.getElementById('drawClass').value;
             
-            // LOGIKA UPDATE: Mengambil data absen (hadir), lalu MENGHILANGKAN orang yang sudah pernah menang undian sebelumnya
             let pool = state.attendance.filter(a => !state.drawWinners.some(w => w.participantId === a.participantId));
             
             if (selectedClass !== 'Semua') {
@@ -758,7 +756,6 @@
                     
                     const winner = pool[Math.floor(Math.random() * pool.length)];
                     
-                    // Mencari PIN Pemenang berdasarkan database peserta
                     const participant = state.participants.find(p => p.id === winner.participantId);
                     const pin = participant && participant.qrCode ? participant.qrCode.slice(-4) : '0000';
 
@@ -767,10 +764,8 @@
                     
                     drawName.innerText = winner.name;
                     drawName.classList.replace('text-white', 'text-yellow-300');
-                    // Tampilkan PIN Pemenang di Kotak Undian
                     drawDetails.innerHTML = `🎉 KELAS ${winner.classGrade.toUpperCase()} | ${winner.sector} 🎉<br><span class="inline-block mt-2 bg-purple-900 text-purple-200 px-3 py-1 rounded-lg border border-purple-500 font-mono text-xs tracking-widest">PIN TIKET: ${pin}</span>`;
                     
-                    // Simpan Pemenang ke Database agar tidak terpilih lagi
                     push(ref(db, 'drawWinners'), {
                         participantId: winner.participantId,
                         name: winner.name,
@@ -793,15 +788,15 @@
             if (state.tab === 'register') {
                 if (!document.getElementById('registration-form')) {
                     root.innerHTML = `
-                        <div id="registration-form" class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 mb-6 relative overflow-hidden">
+                        <div id="registration-form" class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 mb-6 relative overflow-hidden max-w-3xl mx-auto w-full">
                             <div class="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-bl-[100px] -z-0"></div>
-                            <h3 class="font-bold text-xl text-slate-800 mb-6 relative z-10">Pendaftaran Baru</h3>
-                            <div class="space-y-4 relative z-10">
+                            <h3 class="font-bold text-xl text-slate-800 mb-6 relative z-10 text-center md:text-left">Pendaftaran Baru</h3>
+                            <div class="space-y-4 relative z-10 max-w-2xl mx-auto md:mx-0">
                                 <div>
                                     <label class="block text-xs font-bold text-slate-500 mb-1.5 ml-1">Nama Lengkap</label>
                                     <input id="inName" type="text" placeholder="Masukkan nama..." class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-slate-800 focus:border-red-500 focus:bg-white outline-none transition-all placeholder:text-slate-400">
                                 </div>
-                                <div class="flex gap-4">
+                                <div class="flex flex-col md:flex-row gap-4">
                                     <div class="flex-1">
                                         <label class="block text-xs font-bold text-slate-500 mb-1.5 ml-1">Kategori</label>
                                         <div class="relative">
@@ -846,15 +841,15 @@
                                 </button>
                             </div>
                         </div>
-                        <div id="participant-list-container"></div>
+                        <div id="participant-list-container" class="w-full"></div>
                     `;
                 }
                 window.renderParticipantListOnly();
             } else if (state.tab === 'find') {
                 root.innerHTML = `
-                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 relative overflow-hidden">
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 relative overflow-hidden max-w-2xl mx-auto w-full">
                         <div class="absolute -right-6 -top-6 w-32 h-32 bg-blue-50 rounded-full"></div>
-                        <div class="flex items-center gap-4 mb-8 relative z-10">
+                        <div class="flex items-center gap-4 mb-8 relative z-10 md:justify-center">
                             <div class="bg-blue-100 w-12 h-12 rounded-2xl flex items-center justify-center text-blue-600 shadow-inner"><span class="text-2xl">🎫</span></div>
                             <div>
                                 <h3 class="font-bold text-xl text-slate-800">Cari Tiket Anda</h3>
@@ -893,7 +888,7 @@
                 const iconColor = isGift ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600';
 
                 root.innerHTML = `
-                    <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 text-center mb-6">
+                    <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 text-center mb-6 max-w-2xl mx-auto w-full">
                         <div class="flex items-center justify-center gap-3 mb-4">
                             <div class="w-10 h-10 rounded-xl ${iconColor} flex items-center justify-center text-xl shadow-inner">
                                 ${isGift ? '🎁' : '📷'}
@@ -906,30 +901,30 @@
                         <div id="reader" class="mb-2 mx-auto w-full max-w-sm"></div>
                         
                         <p class="text-xs font-medium text-slate-400 px-4 mt-2">${hint}</p>
-                        <p class="text-[10px] font-bold text-amber-600 bg-amber-50 px-3 py-2.5 rounded-xl mt-3 border border-amber-200 shadow-sm">
+                        <p class="text-[10px] font-bold text-amber-600 bg-amber-50 px-3 py-2.5 rounded-xl mt-3 border border-amber-200 shadow-sm md:max-w-md md:mx-auto">
                             💡 Jika kamera laptop menolak izin (NotAllowedError), silakan klik ikon gembok 🔒 di URL browser untuk mengizinkan, ATAU langsung gunakan tombol <span class="text-emerald-700">"Scan an Image File"</span> di atas.
                         </p>
                     </div>
                     
-                    <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100">
-                        <div class="flex items-center justify-between mb-4">
+                    <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 max-w-4xl mx-auto w-full">
+                        <div class="flex items-center justify-between mb-4 md:max-w-xl md:mx-auto">
                             <div class="text-sm font-bold text-slate-700 flex items-center gap-2">
                                 <span class="text-slate-400">${state.isAdminAuthenticated ? '✅' : '🔒'}</span> Pencarian Manual
                             </div>
                             <div class="text-[9px] font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded-md uppercase tracking-wider">Admin Only</div>
                         </div>
-                        <input oninput="window.handleSearch(this)" type="text" placeholder="Ketik nama peserta..." class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl mb-3 text-sm font-medium text-slate-700 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-slate-400">
-                        <div id="manual-list" class="max-h-60 overflow-y-auto no-scrollbar rounded-xl border border-slate-100 bg-white">
-                            <div class="text-center text-slate-400 py-6 text-sm">Ketik untuk mencari data</div>
+                        <input oninput="window.handleSearch(this)" type="text" placeholder="Ketik nama peserta..." class="w-full max-w-xl mx-auto block p-3.5 bg-slate-50 border border-slate-200 rounded-xl mb-3 text-sm font-medium text-slate-700 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-slate-400">
+                        <div id="manual-list" class="max-h-[50vh] overflow-y-auto no-scrollbar rounded-xl border border-slate-100 bg-slate-50/50 p-2 grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <div class="text-center text-slate-400 py-6 text-sm md:col-span-full">Ketik untuk mencari data</div>
                         </div>
                     </div>
                 `;
             } 
             else if (state.tab === 'draw') {
                 root.innerHTML = `
-                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 relative overflow-hidden text-center">
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 relative overflow-hidden text-center max-w-3xl mx-auto w-full">
                         <div class="absolute -right-6 -top-6 w-32 h-32 bg-purple-50 rounded-full"></div>
-                        <div class="relative z-10">
+                        <div class="relative z-10 max-w-xl mx-auto">
                             <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600 text-3xl shadow-inner mx-auto mb-4">🎰</div>
                             <h3 class="font-bold text-2xl text-slate-800 mb-1">Door Prize</h3>
                             <p class="text-[11px] text-slate-500 mb-8 font-medium">Acak pemenang dari peserta yang <b>sudah hadir (Scan)</b></p>
@@ -960,38 +955,46 @@
                             <button id="btnDraw" onclick="window.spinDoorPrize()" class="w-full py-4 bg-purple-600 text-white font-bold rounded-2xl shadow-lg shadow-purple-200 hover:bg-purple-700 active:scale-95 transition-all flex justify-center items-center gap-2">
                                 🎲 Acak Pemenang Sekarang
                             </button>
-
-                            <div class="mt-8 border-t border-slate-100 pt-6">
-                                <div id="drawWinnersListContainer"></div>
-                            </div>
+                        </div>
+                        
+                        <div class="mt-8 border-t border-slate-100 pt-6 max-w-3xl mx-auto w-full">
+                            <div id="drawWinnersListContainer"></div>
                         </div>
                     </div>
                 `;
-                // Panggil render list riwayat
                 setTimeout(() => { window.renderDrawWinners(); }, 50);
             } else if (state.tab === 'data') {
                 const isGiftView = state.dataViewMode === 'gifts';
-                const dataToShow = isGiftView ? state.gifts : state.attendance;
-                const headerText = isGiftView ? 'Laporan Pengambilan Hadiah' : 'Laporan Kehadiran Jemaat';
-                const btnAttendanceClass = !isGiftView ? 'bg-slate-800 text-white shadow-lg' : 'bg-slate-100 text-slate-500 hover:bg-slate-200';
+                const isDrawView = state.dataViewMode === 'draws';
+                const isAttView = state.dataViewMode === 'attendance';
+                
+                const dataToShow = isDrawView ? state.drawWinners : (isGiftView ? state.gifts : state.attendance);
+                const headerText = isDrawView ? 'Laporan Pemenang Undian' : (isGiftView ? 'Laporan Pengambilan Hadiah' : 'Laporan Kehadiran Jemaat');
+                
+                const btnAttendanceClass = isAttView ? 'bg-slate-800 text-white shadow-lg' : 'bg-slate-100 text-slate-500 hover:bg-slate-200';
                 const btnGiftClass = isGiftView ? 'bg-red-600 text-white shadow-lg' : 'bg-slate-100 text-slate-500 hover:bg-slate-200';
+                const btnDrawClass = isDrawView ? 'bg-purple-600 text-white shadow-lg' : 'bg-slate-100 text-slate-500 hover:bg-slate-200';
 
                 root.innerHTML = `
-                    <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 mb-6">
+                    <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 mb-6 max-w-3xl mx-auto w-full">
                         <div class="flex gap-2 mb-5">
                             <button onclick="window.switchDataView('attendance')" class="flex-1 py-3 text-xs font-bold rounded-xl transition-all ${btnAttendanceClass}">📋 Hadir</button>
                             <button onclick="window.switchDataView('gifts')" class="flex-1 py-3 text-xs font-bold rounded-xl transition-all ${btnGiftClass}">🎁 Hadiah</button>
+                            <button onclick="window.switchDataView('draws')" class="flex-1 py-3 text-xs font-bold rounded-xl transition-all ${btnDrawClass}">🎰 Undian</button>
                         </div>
-                        <div class="grid grid-cols-1 gap-2.5 mb-5">
-                            <button onclick="window.exportData('p')" class="w-full py-3 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-bold hover:bg-indigo-100 transition-colors text-center flex justify-center items-center gap-2">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 mb-5">
+                            <button onclick="window.exportData('p')" class="w-full h-full py-3 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-bold hover:bg-indigo-100 transition-colors flex justify-center items-center gap-2">
                                 📥 Download Data Master
                             </button>
-                            <div class="grid grid-cols-2 gap-2.5">
+                            <div class="grid grid-cols-3 gap-2">
                                 <button onclick="window.exportData('a')" class="py-3 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl text-[10px] font-bold hover:bg-emerald-100 transition-colors text-center">
-                                    📥 Rekap Absen
+                                    📥 Absen
                                 </button>
                                 <button onclick="window.exportData('g')" class="py-3 bg-red-50 text-red-700 border border-red-200 rounded-xl text-[10px] font-bold hover:bg-red-100 transition-colors text-center">
-                                    📥 Rekap Hadiah
+                                    📥 Hadiah
+                                </button>
+                                <button onclick="window.exportData('d')" class="py-3 bg-purple-50 text-purple-700 border border-purple-200 rounded-xl text-[10px] font-bold hover:bg-purple-100 transition-colors text-center">
+                                    📥 Undian
                                 </button>
                             </div>
                         </div>
@@ -1000,35 +1003,36 @@
                         </button>
                     </div>
 
-                    <div class="flex justify-between items-end px-2 mb-3 mt-4">
+                    <div class="flex justify-between items-end px-2 mb-3 mt-4 max-w-5xl mx-auto w-full">
                         <div><h3 class="font-bold text-slate-800 text-base">${headerText}</h3></div>
                         <span class="text-[10px] font-bold bg-slate-200 text-slate-700 px-3 py-1 rounded-full shadow-inner">${dataToShow.length} Data</span>
                     </div>
 
-                    <div class="space-y-3 pb-8">
-                        ${dataToShow.length === 0 ? `<div class="text-center py-12 bg-white rounded-2xl border-2 border-dashed border-slate-200 text-slate-400"><div class="text-4xl mb-3 opacity-50">📭</div><div class="text-sm font-medium">Belum ada data terekam</div></div>` : ''}
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pb-8 max-w-5xl mx-auto w-full">
+                        ${dataToShow.length === 0 ? `<div class="text-center py-12 bg-white rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 md:col-span-full"><div class="text-4xl mb-3 opacity-50">📭</div><div class="text-sm font-medium">Belum ada data terekam</div></div>` : ''}
                         ${dataToShow.slice().reverse().map(item => `
-                            <div class="bg-white p-4 rounded-2xl shadow-sm flex items-center justify-between border border-slate-100">
-                                <div>
-                                    <div class="font-bold text-slate-800 text-sm mb-1">${item.name}</div>
-                                    <div class="flex gap-2 text-[10px] text-slate-500 flex-wrap mt-1">
-                                        ${item.category ? `<span class="bg-amber-50 text-amber-600 border border-amber-100 px-2 py-0.5 rounded-md font-semibold">${item.category}</span>` : ''}
-                                        <span class="bg-slate-100 px-2 py-0.5 rounded-md font-semibold">${item.classGrade}</span>
-                                        <span class="bg-slate-100 px-2 py-0.5 rounded-md font-semibold">${item.sector}</span>
+                            <div class="bg-white p-4 rounded-2xl shadow-sm flex items-center justify-between border border-slate-100 hover:shadow-md transition-all">
+                                <div class="min-w-0 pr-2">
+                                    <div class="font-bold text-slate-800 text-sm mb-1 truncate">${item.name}</div>
+                                    <div class="flex gap-1 text-[10px] text-slate-500 flex-wrap mt-1">
+                                        ${item.category ? `<span class="bg-amber-50 text-amber-600 border border-amber-100 px-1.5 py-0.5 rounded-md font-semibold">${item.category}</span>` : ''}
+                                        <span class="bg-slate-100 px-1.5 py-0.5 rounded-md font-semibold">${item.classGrade}</span>
+                                        <span class="bg-slate-100 px-1.5 py-0.5 rounded-md font-semibold">${item.sector}</span>
+                                        ${isDrawView ? `<span class="bg-purple-50 text-purple-600 border border-purple-100 px-1.5 py-0.5 rounded-md font-semibold font-mono">PIN: ${item.pin}</span>` : ''}
                                     </div>
-                                    <div class="text-[10px] text-slate-400 mt-2 font-mono flex items-center gap-1 font-medium">🕒 Jam ${isGiftView ? 'Klaim' : 'Check-in'}: ${item.timestamp}</div>
+                                    <div class="text-[10px] text-slate-400 mt-2 font-mono flex items-center gap-1 font-medium truncate">🕒 Jam ${isDrawView ? 'Menang' : (isGiftView ? 'Klaim' : 'Check-in')}: ${item.timestamp}</div>
                                 </div>
-                                <div class="${isGiftView ? 'bg-red-50 text-red-600 border-red-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'} px-3 py-1.5 rounded-lg text-[10px] font-bold border flex items-center gap-1 shadow-sm">
-                                    <span class="text-sm">✓</span> ${isGiftView ? 'DIAMBIL' : 'HADIR'}
+                                <div class="${isDrawView ? 'bg-purple-50 text-purple-600 border-purple-100' : (isGiftView ? 'bg-red-50 text-red-600 border-red-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100')} px-2.5 py-1.5 rounded-lg text-[10px] font-bold border flex items-center gap-1 shadow-sm shrink-0">
+                                    <span class="hidden md:inline">✓</span> ${isDrawView ? 'MENANG' : (isGiftView ? 'DIAMBIL' : 'HADIR')}
                                 </div>
                             </div>
                         `).join('')}
-                    </div>
-                    
-                    <div class="mt-8 text-center pb-8">
-                        <button onclick="window.resetData()" class="text-[10px] text-slate-400 font-bold border border-slate-200 px-4 py-2 rounded-full hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors opacity-70 hover:opacity-100">
-                            ⚠️ Hapus Seluruh Database
-                        </button>
+                        
+                        <div class="mt-8 text-center pb-8 md:col-span-full w-full">
+                            <button onclick="window.resetData()" class="text-[10px] text-slate-400 font-bold border border-slate-200 px-4 py-2 rounded-full hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors opacity-70 hover:opacity-100">
+                                ⚠️ Hapus Seluruh Database
+                            </button>
+                        </div>
                     </div>
                 `;
             }
@@ -1190,7 +1194,12 @@
                 csv += "Nama,Kategori,Kelas,Sektor,Waktu_Ambil_Hadiah\n";
                 data = state.gifts; filename = "Laporan_Hadiah_Natal_2026.csv";
                 data.forEach(x => { csv += `"${x.name}","${x.category || '-'}","${x.classGrade || '-'}","${x.sector || '-'}","${x.timestamp}"\n`; });
+            } else if (type === 'd') {
+                csv += "Nama,Kelas,Sektor,PIN,Waktu_Menang\n";
+                data = state.drawWinners; filename = "Laporan_Undian_Natal_2026.csv";
+                data.forEach(x => { csv += `"${x.name}","${x.classGrade || '-'}","${x.sector || '-'}","${x.pin || '-'}","${x.timestamp}"\n`; });
             }
+            
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob); link.download = filename;
@@ -1241,7 +1250,7 @@
                 set(ref(db, 'participants'), null); 
                 set(ref(db, 'attendance'), null); 
                 set(ref(db, 'gifts'), null);
-                set(ref(db, 'drawWinners'), null); // Hapus list pemenang undian juga
+                set(ref(db, 'drawWinners'), null); 
                 alert("Database berhasil di-reset ke kondisi kosong.");
             } else if (pass !== null && pass !== ADMIN_PASS) {
                 alert("⛔ AKSES DITOLAK! Password salah.");
