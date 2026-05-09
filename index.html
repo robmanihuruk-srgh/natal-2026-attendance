@@ -17,10 +17,12 @@
     
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        /* CSS Scanner Customization */
         #reader { 
             width: 100%; 
             background: #f8fafc; 
@@ -37,7 +39,6 @@
             max-height: 400px;
         }
         
-        /* Perbaikan UI Library Scanner */
         #reader button {
             background-color: #059669; color: white; padding: 10px 20px;
             border-radius: 10px; border: none; font-weight: 700; margin: 10px auto;
@@ -61,21 +62,17 @@
         .animate-pulse-soft { animation: pulse-soft 2s infinite ease-in-out; }
         img.qr-code { image-rendering: pixelated; mix-blend-mode: multiply; -webkit-touch-callout: default; }
         
-        /* Hide Scrollbar */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* Custom scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
 
-        /* Glassmorphism */
         .glass { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); }
         .glass-dark { background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
         
-        /* Ticket Edge ZigZag */
         .ticket-edge {
             background: linear-gradient(135deg, transparent 10px, #ffffff 0) top left, linear-gradient(225deg, transparent 10px, #ffffff 0) top right, linear-gradient(315deg, transparent 10px, #ffffff 0) bottom right, linear-gradient(45deg, transparent 10px, #ffffff 0) bottom left;
             background-size: 50% 50%;
@@ -166,106 +163,108 @@
         </main>
     </div>
 
-    <div id="confirmModal" class="fixed inset-0 z-[8000] flex items-center justify-center bg-slate-900/60 hidden backdrop-blur-sm transition-all duration-300 opacity-0 px-4">
-        <div class="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl transform scale-95 transition-transform duration-300 m-4">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-xl">✅</div>
-                <h3 class="text-xl font-bold text-slate-800">Cek Data</h3>
-            </div>
-            
-            <div class="bg-slate-50 p-4 rounded-2xl space-y-4 mb-6 border border-slate-100">
-                <div>
-                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Nama Lengkap</div>
-                    <div id="confName" class="font-bold text-lg text-slate-800 leading-tight"></div>
+    <div id="confirmModal" class="fixed inset-0 z-[8000] bg-slate-900/60 hidden backdrop-blur-sm transition-all duration-300 opacity-0 overflow-y-auto">
+        <div class="min-h-[100dvh] flex px-4 py-12">
+            <div class="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl transform scale-95 transition-transform duration-300 m-auto">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-xl">✅</div>
+                    <h3 class="text-xl font-bold text-slate-800">Cek Data</h3>
                 </div>
-                <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-200 border-dashed">
+                
+                <div class="bg-slate-50 p-4 rounded-2xl space-y-4 mb-6 border border-slate-100">
                     <div>
-                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Kategori</div>
-                        <div id="confCategory" class="font-bold text-amber-600 bg-amber-50 inline-block px-2 py-1 rounded-lg text-xs truncate w-full"></div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Nama Lengkap</div>
+                        <div id="confName" class="font-bold text-lg text-slate-800 leading-tight"></div>
                     </div>
-                    <div>
-                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Kelas</div>
-                        <div id="confClass" class="font-bold text-indigo-600 bg-indigo-50 inline-block px-2 py-1 rounded-lg text-xs truncate w-full"></div>
-                    </div>
-                    <div>
-                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Sektor</div>
-                        <div id="confSector" class="font-bold text-sky-600 bg-sky-50 inline-block px-2 py-1 rounded-lg text-xs truncate w-full"></div>
+                    <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-200 border-dashed">
+                        <div>
+                            <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Kategori</div>
+                            <div id="confCategory" class="font-bold text-amber-600 bg-amber-50 inline-block px-2 py-1 rounded-lg text-xs truncate w-full"></div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Kelas</div>
+                            <div id="confClass" class="font-bold text-indigo-600 bg-indigo-50 inline-block px-2 py-1 rounded-lg text-xs truncate w-full"></div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Sektor</div>
+                            <div id="confSector" class="font-bold text-sky-600 bg-sky-50 inline-block px-2 py-1 rounded-lg text-xs truncate w-full"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="flex gap-3">
-                <button onclick="window.closeModal('confirmModal')" class="flex-1 py-3.5 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors">Batal</button>
-                <button onclick="window.processSave()" class="flex-1 py-3.5 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-200 transition-colors">Simpan Data</button>
+                
+                <div class="flex gap-3">
+                    <button onclick="window.closeModal('confirmModal')" class="flex-1 py-3.5 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors">Batal</button>
+                    <button onclick="window.processSave()" class="flex-1 py-3.5 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-200 transition-colors">Simpan Data</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="ticketModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/80 hidden backdrop-blur-md transition-all duration-300 opacity-0 px-4">
-        <div class="w-full max-w-sm transform scale-95 transition-transform duration-300 relative group">
-            <button onclick="window.closeModal('ticketModal')" class="absolute -top-12 right-0 w-10 h-10 flex items-center justify-center text-white bg-white/20 hover:bg-white/40 rounded-full transition-colors backdrop-blur-sm">✕</button>
-            
-            <div class="ticket-edge bg-white rounded-3xl overflow-hidden shadow-2xl relative">
-                <div class="bg-red-700 p-6 text-center relative overflow-hidden">
-                    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] opacity-50"></div>
-                    <div class="relative z-10">
-                        <div class="flex justify-center gap-2 mb-3">
-                            <img src="LOGO-GKPS-ASLI-1.png" class="w-10 h-10 rounded-full bg-white object-contain p-1 shadow-md border-2 border-red-500/50" onerror="this.style.display='none'">
-                            <img src="logo-tema-gkps.jpg" class="w-10 h-10 rounded-full bg-white object-cover p-0.5 shadow-md border-2 border-red-500/50" onerror="this.style.display='none'">
+    <div id="ticketModal" class="fixed inset-0 z-[9999] bg-slate-900/80 hidden backdrop-blur-md transition-all duration-300 opacity-0 overflow-y-auto">
+        <div class="min-h-[100dvh] flex px-4 py-20">
+            <div class="w-full max-w-sm transform scale-95 transition-transform duration-300 relative group m-auto">
+                <button onclick="window.closeModal('ticketModal')" class="absolute -top-14 right-0 w-10 h-10 flex items-center justify-center text-white bg-white/20 hover:bg-white/40 rounded-full transition-colors backdrop-blur-sm z-50 shadow-sm">✕</button>
+                
+                <div class="ticket-edge bg-white rounded-3xl overflow-hidden shadow-2xl relative">
+                    <div class="bg-red-700 p-6 text-center relative overflow-hidden">
+                        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] opacity-50"></div>
+                        <div class="relative z-10">
+                            <div class="flex justify-center gap-2 mb-3">
+                                <img src="LOGO-GKPS-ASLI-1.png" class="w-10 h-10 rounded-full bg-white object-contain p-1 shadow-md border-2 border-red-500/50" onerror="this.style.display='none'">
+                                <img src="logo-tema-gkps.jpg" class="w-10 h-10 rounded-full bg-white object-cover p-0.5 shadow-md border-2 border-red-500/50" onerror="this.style.display='none'">
+                            </div>
+                            <div class="text-red-200 font-bold tracking-widest text-[10px] mb-1 uppercase">Event Pass</div>
+                            <h2 class="text-2xl font-black text-white leading-tight mb-1">NATAL 2026</h2>
+                            <div class="text-red-100 text-[8px] uppercase tracking-wider font-bold leading-tight">Gereja Kristen Protestan Simalungun<br>Tangerang</div>
                         </div>
-                        <div class="text-red-200 font-bold tracking-widest text-[10px] mb-1 uppercase">Event Pass</div>
-                        <h2 class="text-2xl font-black text-white leading-tight mb-1">NATAL 2026</h2>
-                        <div class="text-red-100 text-[8px] uppercase tracking-wider font-bold leading-tight">Gereja Kristen Protestan Simalungun<br>Tangerang</div>
+                    </div>
+                    
+                    <div class="p-6 text-center bg-white relative pb-3">
+                        <h2 id="ticName" class="text-2xl font-bold text-slate-800 leading-tight mb-3">Nama Peserta</h2>
+                        <div class="flex justify-center flex-wrap gap-2 mb-6">
+                            <span id="ticCategory" class="px-4 py-1.5 bg-amber-50 text-amber-700 text-xs font-bold rounded-full border border-amber-100">Kategori</span>
+                            <span id="ticClass" class="px-4 py-1.5 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-full border border-indigo-100">Kelas</span>
+                            <span id="ticSector" class="px-4 py-1.5 bg-sky-50 text-sky-700 text-xs font-bold rounded-full border border-sky-100">Sektor</span>
+                        </div>
+                        
+                        <div class="relative inline-block p-4 bg-white border-2 border-slate-100 rounded-2xl shadow-sm mb-2">
+                            <div class="absolute inset-0 border-2 border-dashed border-red-200 rounded-2xl m-2 pointer-events-none"></div>
+                            <img id="ticQR" src="" class="w-48 object-contain qr-code relative z-10" alt="QR Code Tiket" style="touch-action: pan-y;">
+                        </div>
+                        
+                        <div class="mb-3 mt-1 inline-block bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 shadow-inner">
+                            <span class="text-[10px] text-slate-500 font-bold uppercase mr-1 tracking-wider">PIN TIKET:</span>
+                            <span id="ticPin" class="text-sm font-black text-slate-800 font-mono tracking-widest">0000</span>
+                        </div>
+                        
+                        <div class="text-[10px] text-slate-400 font-medium uppercase tracking-widest mb-3 block">Scan for Attendance</div>
+                        
+                        <div class="bg-blue-50 text-blue-700 text-[10px] px-4 py-2.5 rounded-xl flex items-start gap-2.5 text-left border border-blue-100 mx-auto max-w-[280px]">
+                            <span class="text-sm leading-none mt-0.5">💡</span>
+                            <span class="leading-relaxed"><b>Tips HP:</b> Agar masuk ke Galeri, sentuh & tahan gambar QR di atas, lalu pilih <b>"Simpan Gambar"</b>.</span>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="p-6 text-center bg-white relative pb-3">
-                    <h2 id="ticName" class="text-2xl font-bold text-slate-800 leading-tight mb-3">Nama Peserta</h2>
-                    <div class="flex justify-center flex-wrap gap-2 mb-6">
-                        <span id="ticCategory" class="px-4 py-1.5 bg-amber-50 text-amber-700 text-xs font-bold rounded-full border border-amber-100">Kategori</span>
-                        <span id="ticClass" class="px-4 py-1.5 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-full border border-indigo-100">Kelas</span>
-                        <span id="ticSector" class="px-4 py-1.5 bg-sky-50 text-sky-700 text-xs font-bold rounded-full border border-sky-100">Sektor</span>
-                    </div>
-                    
-                    <div class="relative inline-block p-4 bg-white border-2 border-slate-100 rounded-2xl shadow-sm mb-2">
-                        <div class="absolute inset-0 border-2 border-dashed border-red-200 rounded-2xl m-2 pointer-events-none"></div>
-                        <img id="ticQR" src="" class="w-48 object-contain qr-code relative z-10" alt="QR Code Tiket" style="touch-action: pan-y;">
-                    </div>
-                    
-                    <div class="mb-3 mt-1 inline-block bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 shadow-inner">
-                        <span class="text-[10px] text-slate-500 font-bold uppercase mr-1 tracking-wider">PIN TIKET:</span>
-                        <span id="ticPin" class="text-sm font-black text-slate-800 font-mono tracking-widest">0000</span>
-                    </div>
-                    
-                    <div class="text-[10px] text-slate-400 font-medium uppercase tracking-widest mb-3 block">Scan for Attendance</div>
-                    
-                    <div class="bg-blue-50 text-blue-700 text-[10px] px-4 py-2.5 rounded-xl flex items-start gap-2.5 text-left border border-blue-100 mx-auto max-w-[280px]">
-                        <span class="text-sm leading-none mt-0.5">💡</span>
-                        <span class="leading-relaxed"><b>Tips HP:</b> Agar masuk ke Galeri, sentuh & tahan gambar QR di atas, lalu pilih <b>"Simpan Gambar"</b>.</span>
-                    </div>
+                <div class="flex gap-2 mt-6">
+                    <button onclick="window.downloadBarcode()" class="flex-1 py-3 bg-white text-slate-800 font-bold rounded-2xl shadow-lg hover:bg-slate-50 transition-all flex flex-col items-center justify-center gap-1 text-[11px]">
+                        <span class="text-lg">📥</span> Unduh
+                    </button>
+                    <button onclick="window.closeModal('ticketModal')" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-2xl shadow-lg hover:bg-slate-200 transition-colors flex flex-col items-center justify-center gap-1 text-[11px]">
+                        <span class="text-lg">✖️</span> Tutup
+                    </button>
+                    <button onclick="window.printTicket()" class="flex-1 py-3 bg-red-600 text-white font-bold rounded-2xl shadow-lg hover:bg-red-700 transition-colors flex flex-col items-center justify-center gap-1 text-[11px]">
+                        <span class="text-lg">🖨️</span> Cetak
+                    </button>
                 </div>
-            </div>
-            
-            <div class="flex gap-2 mt-6">
-                <button onclick="window.downloadBarcode()" class="flex-1 py-3 bg-white text-slate-800 font-bold rounded-2xl shadow-lg hover:bg-slate-50 transition-all flex flex-col items-center justify-center gap-1 text-[11px]">
-                    <span class="text-lg">📥</span> Unduh
-                </button>
-                <button onclick="window.closeModal('ticketModal')" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-2xl shadow-lg hover:bg-slate-200 transition-colors flex flex-col items-center justify-center gap-1 text-[11px]">
-                    <span class="text-lg">✖️</span> Tutup
-                </button>
-                <button onclick="window.printTicket()" class="flex-1 py-3 bg-red-600 text-white font-bold rounded-2xl shadow-lg hover:bg-red-700 transition-colors flex flex-col items-center justify-center gap-1 text-[11px]">
-                    <span class="text-lg">🖨️</span> Cetak
-                </button>
             </div>
         </div>
     </div>
 
     <input type="file" id="importInput" accept=".csv" class="hidden" onchange="window.importData(this)">
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
+    <script>
+        // MENGGUNAKAN FIREBASE COMPAT SDK - AMAN UNTUK URL FILE:/// LOKAL
         const firebaseConfig = {
             apiKey: "AIzaSyBzka8Ps_nf-8zDA2tMDmqEMw6zMoy3aeM",
             authDomain: "eventnatal2025.firebaseapp.com",
@@ -277,8 +276,8 @@
             measurementId: "G-QX5GJPEDCF"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
         const ADMIN_PASS = "ADMIN123";
 
         let state = {
@@ -342,28 +341,28 @@
             `;
         };
 
-        // --- LISTENERS ---
-        onValue(ref(db, 'participants'), s => {
+        // --- LISTENERS MENGGUNAKAN FORMAT COMPAT ---
+        db.ref('participants').on('value', s => {
             state.participants = s.val() ? Object.values(s.val()) : [];
             updateStats();
             if (state.tab === 'register') window.renderParticipantListOnly();
             document.getElementById('loading').style.display = 'none';
         });
         
-        onValue(ref(db, 'attendance'), s => {
+        db.ref('attendance').on('value', s => {
             state.attendance = s.val() ? Object.values(s.val()) : [];
             updateStats();
             if (state.tab === 'data' && state.dataViewMode === 'attendance') window.render();
             document.getElementById('loading').style.display = 'none';
         });
 
-        onValue(ref(db, 'gifts'), s => {
+        db.ref('gifts').on('value', s => {
             state.gifts = s.val() ? Object.values(s.val()) : [];
             updateStats();
             if (state.tab === 'data' && state.dataViewMode === 'gifts') window.render();
         });
 
-        onValue(ref(db, 'drawWinners'), s => {
+        db.ref('drawWinners').on('value', s => {
             state.drawWinners = s.val() ? Object.values(s.val()) : [];
             if (state.tab === 'draw') window.renderDrawWinners();
             if (state.tab === 'data' && state.dataViewMode === 'draws') window.render();
@@ -393,7 +392,11 @@
             
             const m = document.getElementById('confirmModal');
             m.classList.remove('hidden');
-            setTimeout(() => { m.classList.remove('opacity-0'); m.children[0].classList.replace('scale-95','scale-100'); }, 10);
+            setTimeout(() => { 
+                m.classList.remove('opacity-0'); 
+                const scaleContainer = m.querySelector('.transform.scale-95') || m.querySelector('.transform.scale-100');
+                if(scaleContainer) scaleContainer.classList.replace('scale-95','scale-100'); 
+            }, 10);
         };
 
         window.processSave = () => {
@@ -402,7 +405,7 @@
             const id = Date.now().toString(); 
             const qr = `NATAL2026-${id.slice(-6)}`;
             
-            push(ref(db, 'participants'), {
+            db.ref('participants').push({
                 id, name, category: cat, classGrade: cls, sector: sec, qrCode: qr,
                 registeredAt: fmtDate(), timestamp: Date.now()
             });
@@ -504,7 +507,7 @@
             } else {
                 beep('success');
                 const ts = fmtDate();
-                push(ref(db, 'attendance'), {
+                db.ref('attendance').push({
                     id: Date.now().toString(), participantId: p.id, name: p.name,
                     category: p.category || '', classGrade: p.classGrade, sector: p.sector, timestamp: ts
                 });
@@ -519,7 +522,7 @@
             } else {
                 beep('success');
                 const ts = fmtDate();
-                push(ref(db, 'gifts'), {
+                db.ref('gifts').push({
                     id: Date.now().toString(), participantId: p.id, name: p.name,
                     category: p.category || '', classGrade: p.classGrade, sector: p.sector, timestamp: ts
                 });
@@ -651,6 +654,8 @@
                 }
             });
             window.render();
+            
+            /* Catatan Keamanan: Akses Kamera mungkin akan diblokir browser jika file dibuka langsung tanpa web server */
             if(t === 'scan' || t === 'gift') setTimeout(() => window.initScanner(), 300);
         };
         
@@ -766,7 +771,7 @@
                     drawName.classList.replace('text-white', 'text-yellow-300');
                     drawDetails.innerHTML = `🎉 KELAS ${winner.classGrade.toUpperCase()} | ${winner.sector} 🎉<br><span class="inline-block mt-2 bg-purple-900 text-purple-200 px-3 py-1 rounded-lg border border-purple-500 font-mono text-xs tracking-widest">PIN TIKET: ${pin}</span>`;
                     
-                    push(ref(db, 'drawWinners'), {
+                    db.ref('drawWinners').push({
                         participantId: winner.participantId,
                         name: winner.name,
                         classGrade: winner.classGrade,
@@ -902,7 +907,7 @@
                         
                         <p class="text-xs font-medium text-slate-400 px-4 mt-2">${hint}</p>
                         <p class="text-[10px] font-bold text-amber-600 bg-amber-50 px-3 py-2.5 rounded-xl mt-3 border border-amber-200 shadow-sm md:max-w-md md:mx-auto">
-                            💡 Jika kamera laptop menolak izin (NotAllowedError), silakan klik ikon gembok 🔒 di URL browser untuk mengizinkan, ATAU langsung gunakan tombol <span class="text-emerald-700">"Scan an Image File"</span> di atas.
+                            💡 Jika kamera tidak bisa diakses di laptop, Anda tetap bisa absensi menggunakan fasilitas <span class="text-emerald-700">"Pencarian Manual"</span> di bawah ini.
                         </p>
                     </div>
                     
@@ -1086,7 +1091,11 @@
 
             const t = document.getElementById('ticketModal');
             t.classList.remove('hidden');
-            setTimeout(() => { t.style.opacity = '1'; t.children[0].classList.replace('scale-95', 'scale-100'); }, 10);
+            setTimeout(() => { 
+                t.style.opacity = '1'; 
+                const scaleContainer = t.querySelector('.transform.scale-95') || t.querySelector('.transform.scale-100');
+                if(scaleContainer) scaleContainer.classList.replace('scale-95', 'scale-100'); 
+            }, 10);
         };
         
         window.downloadBarcode = async () => {
@@ -1217,7 +1226,7 @@
                      const [n, cat, cl, sc] = l.split(',').map(x => x?.replace(/"/g,'').trim());
                      if(n) {
                          const id = (Date.now()+i).toString();
-                         push(ref(db, 'participants'), {
+                         db.ref('participants').push({
                              id, name: n, category: cat || 'ASM', classGrade: cl || 'Pagi', sector: sc || 'Sektor 1',
                              qrCode: `NATAL2026-${id.slice(-6)}`, registeredAt: fmtDate(), timestamp: Date.now()
                          });
@@ -1247,10 +1256,10 @@
             const pass = prompt(warningText);
             
             if(pass === ADMIN_PASS && confirm("Apakah Anda YAKIN ingin menghapus SEMUA data? Data yang terhapus tidak dapat dikembalikan.")) {
-                set(ref(db, 'participants'), null); 
-                set(ref(db, 'attendance'), null); 
-                set(ref(db, 'gifts'), null);
-                set(ref(db, 'drawWinners'), null); 
+                db.ref('participants').set(null); 
+                db.ref('attendance').set(null); 
+                db.ref('gifts').set(null);
+                db.ref('drawWinners').set(null); 
                 alert("Database berhasil di-reset ke kondisi kosong.");
             } else if (pass !== null && pass !== ADMIN_PASS) {
                 alert("⛔ AKSES DITOLAK! Password salah.");
@@ -1260,7 +1269,8 @@
         window.closeModal = (id) => {
             const m = document.getElementById(id);
             m.classList.add('opacity-0');
-            m.children[0].classList.replace('scale-100','scale-95');
+            const scaleContainer = m.querySelector('.transform.scale-100') || m.querySelector('.transform.scale-95');
+            if(scaleContainer) scaleContainer.classList.replace('scale-100','scale-95');
             setTimeout(() => m.classList.add('hidden'), 300);
         };
 
