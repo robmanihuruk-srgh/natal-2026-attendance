@@ -1387,6 +1387,92 @@
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && state.board.open) window.closePeopleBoard(); });
         // ========================================================================
 
+        // ===================== PENGATURAN KELAS UNDIAN =====================
+        // Tersimpan di /settings/drawClasses (true = aktif). Bila belum pernah diatur, pakai bawaan:
+        // Semua Kelas, Kelas Pagi & Umum NONAKTIF. Admin bisa mengubah dari tab Undian.
+        const DRAW_CLASS_OPTIONS = [
+            { key: 'semua',  value: 'Semua',  label: 'Semua Kelas (Bebas)' },
+            { key: 'pagi',   value: 'Pagi',   label: 'Kelas Pagi' },
+            { key: 'daud',   value: 'Daud',   label: 'Kelas Daud' },
+            { key: 'daniel', value: 'Daniel', label: 'Kelas Daniel' },
+            { key: 'paulus', value: 'Paulus', label: 'Kelas Paulus' },
+            { key: 'ester',  value: 'Ester',  label: 'Kelas Ester' },
+            { key: 'umum',   value: '-',      label: 'Umum / Tidak Ada' }
+        ];
+        const DRAW_CLASS_DEFAULT = { semua: false, pagi: false, daud: true, daniel: true, paulus: true, ester: true, umum: false };
+        state.drawClassSettings = null;
+        state.drawAdminOpen = false;
+
+        const drawClassEnabled = (key) => {
+            const st = state.drawClassSettings;
+            return (st && typeof st[key] === 'boolean') ? st[key] : DRAW_CLASS_DEFAULT[key];
+        };
+        const drawOptByValue = (v) => DRAW_CLASS_OPTIONS.find(o => o.value === v);
+
+        window.drawClassOptionsHTML = (current) => {
+            const enabled = DRAW_CLASS_OPTIONS.filter(o => drawClassEnabled(o.key));
+            const sel = (current && drawOptByValue(current) && drawClassEnabled(drawOptByValue(current).key)) ? current : (enabled[0] ? enabled[0].value : '');
+            let html = enabled.length ? '' : '<option value="" selected disabled>Tidak ada kelas yang aktif</option>';
+            html += DRAW_CLASS_OPTIONS.map(o => {
+                const on = drawClassEnabled(o.key);
+                return `<option value="${o.value}" ${on ? '' : 'disabled'} ${on && o.value === sel ? 'selected' : ''}>${o.label}${on ? '' : ' — nonaktif'}</option>`;
+            }).join('');
+            return html;
+        };
+
+        window.drawClassAdminHTML = () => {
+            if (!isAdmin()) return '';
+            const custom = !!state.drawClassSettings;
+            return `
+                <details class="mb-6 text-left bg-purple-50/60 border border-purple-100 rounded-2xl overflow-hidden" ${state.drawAdminOpen ? 'open' : ''} ontoggle="state.drawAdminOpen = this.open">
+                    <summary class="cursor-pointer select-none px-4 py-3 text-xs font-bold text-purple-700 flex items-center justify-between">
+                        <span>⚙️ Atur Pilihan Kelas Undian <span class="text-[10px] font-semibold text-purple-400">(khusus admin)</span></span>
+                        <span class="text-[10px] font-bold bg-white border border-purple-100 text-purple-600 px-2 py-0.5 rounded-md">${DRAW_CLASS_OPTIONS.filter(o => drawClassEnabled(o.key)).length}/${DRAW_CLASS_OPTIONS.length} aktif</span>
+                    </summary>
+                    <div class="px-4 pb-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        ${DRAW_CLASS_OPTIONS.map(o => {
+                            const on = drawClassEnabled(o.key);
+                            return `
+                            <label class="flex items-center justify-between gap-2 p-3 rounded-xl border cursor-pointer transition-colors ${on ? 'bg-white border-purple-200' : 'bg-slate-50 border-slate-200'}">
+                                <span class="text-sm font-bold ${on ? 'text-slate-700' : 'text-slate-400'}">${o.label}</span>
+                                <span class="flex items-center gap-2">
+                                    <span class="text-[10px] font-bold ${on ? 'text-emerald-600' : 'text-slate-400'}">${on ? 'AKTIF' : 'NONAKTIF'}</span>
+                                    <input type="checkbox" class="w-5 h-5 accent-purple-600" ${on ? 'checked' : ''} onchange="window.toggleDrawClass('${o.key}', this.checked)">
+                                </span>
+                            </label>`;
+                        }).join('')}
+                    </div>
+                    <div class="px-4 pb-4 pt-1 flex flex-wrap items-center justify-between gap-2">
+                        <span class="text-[10px] text-slate-500 font-medium">Perubahan langsung berlaku di semua perangkat petugas.</span>
+                        <button onclick="window.resetDrawClassDefault()" class="text-[10px] font-bold text-purple-600 hover:text-purple-800 underline ${custom ? '' : 'hidden'}">Kembalikan ke bawaan</button>
+                    </div>
+                </details>`;
+        };
+
+        window.refreshDrawClassUI = () => {
+            if (state.tab !== 'draw') return;
+            const sel = document.getElementById('drawClass');
+            if (sel) sel.innerHTML = window.drawClassOptionsHTML(sel.value);
+            const adm = document.getElementById('drawClassAdmin');
+            if (adm) adm.innerHTML = window.drawClassAdminHTML();
+        };
+
+        const saveDrawClasses = (obj) => db.ref('settings/drawClasses').set(obj).catch(e => { handleWriteError(e); window.refreshDrawClassUI(); });
+
+        window.toggleDrawClass = (key, on) => {
+            if (!isAdmin()) { window.refreshDrawClassUI(); return; }
+            const obj = {};
+            DRAW_CLASS_OPTIONS.forEach(o => { obj[o.key] = drawClassEnabled(o.key); });
+            obj[key] = !!on;
+            saveDrawClasses(obj);
+        };
+        window.resetDrawClassDefault = () => {
+            if (!isAdmin()) return;
+            if (!confirm('Kembalikan pilihan kelas undian ke bawaan?\n(Semua Kelas, Kelas Pagi & Umum dinonaktifkan)')) return;
+            saveDrawClasses(Object.assign({}, DRAW_CLASS_DEFAULT));
+        };
+        // ========================================================================
+
         // --- LISTENERS MENGGUNAKAN FORMAT COMPAT ---
         db.ref('participants').on('value', s => {
             state.participants = s.val() ? Object.values(s.val()) : [];
@@ -1410,6 +1496,11 @@
             if (state.tab === 'data' && state.dataViewMode === 'gifts') window.render();
             window.refreshPeopleBoard();
         });
+
+        db.ref('settings/drawClasses').on('value', s => {
+            state.drawClassSettings = s.val();
+            window.refreshDrawClassUI();
+        }, err => console.warn('Pengaturan kelas undian tidak terbaca', err));
 
         db.ref('drawWinners').on('value', s => {
             state.drawWinners = s.val() ? Object.values(s.val()) : [];
@@ -1758,6 +1849,12 @@
         window.spinDoorPrize = () => {
             if (!can('draw')) { window.requirePerm('draw', () => {}, 'Undian Door Prize'); return; }
             const selectedClass = document.getElementById('drawClass').value;
+            const selOpt = drawOptByValue(selectedClass);
+            if (!selOpt || !drawClassEnabled(selOpt.key)) {
+                alert('⛔ Pilihan kelas ini sedang dinonaktifkan.\nPilih kelas lain, atau minta admin mengaktifkannya.');
+                window.refreshDrawClassUI();
+                return;
+            }
             
             let pool = state.attendance.filter(a => !state.drawWinners.some(w => w.participantId === a.participantId));
             
@@ -1874,7 +1971,7 @@
                                     <div class="relative">
                                         <select id="inSector" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-slate-700 focus:outline-none focus:border-red-500 focus:bg-white appearance-none transition-all">
                                             <option value="" disabled selected>Pilih Sektor...</option>
-                                            ${[...Array(12)].map((_,i)=>`<option value="Sektor ${i+1}">Sektor ${i+1}</option>`).join('')}
+                                            ${[...Array(11)].map((_,i)=>`<option value="Sektor ${i+1}">Sektor ${i+1}</option>`).join('')}
                                         </select>
                                         <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400">▼</div>
                                     </div>
@@ -1909,7 +2006,7 @@
                                 <div class="relative">
                                     <select id="findSector" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-slate-700 focus:outline-none focus:border-blue-500 focus:bg-white appearance-none transition-all">
                                         <option value="" disabled selected>Pilih Sektor Anda</option>
-                                        ${[...Array(12)].map((_,i)=>`<option value="Sektor ${i+1}">Sektor ${i+1}</option>`).join('')}
+                                        ${[...Array(11)].map((_,i)=>`<option value="Sektor ${i+1}">Sektor ${i+1}</option>`).join('')}
                                     </select>
                                     <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400">▼</div>
                                 </div>
@@ -1985,17 +2082,12 @@
                                 <label class="block text-xs font-bold text-slate-500 mb-2 text-left ml-1">Filter Kelas Undian</label>
                                 <div class="relative">
                                     <select id="drawClass" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 focus:outline-none focus:border-purple-50 appearance-none">
-                                        <option value="Semua">Semua Kelas (Bebas)</option>
-                                        <option value="Pagi">Kelas Pagi</option>
-                                        <option value="Daud">Kelas Daud</option>
-                                        <option value="Daniel">Kelas Daniel</option>
-                                        <option value="Paulus">Kelas Paulus</option>
-                                        <option value="Ester">Kelas Ester</option>
-                                        <option value="-">Umum / Tidak Ada</option>
+                                        ${window.drawClassOptionsHTML()}
                                     </select>
                                     <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400">▼</div>
                                 </div>
                             </div>
+                            <div id="drawClassAdmin">${window.drawClassAdminHTML()}</div>
                             
                             <div id="drawBox" class="bg-slate-800 p-8 rounded-[2rem] mb-6 border-4 border-slate-700 shadow-2xl hidden relative overflow-hidden transition-all duration-500">
                                 <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] opacity-20"></div>
