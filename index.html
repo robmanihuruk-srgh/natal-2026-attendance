@@ -160,6 +160,9 @@
             <button onclick="window.setTab('data')" id="tab-data" class="snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-md">
                 <span class="text-lg">📊</span><span>Data</span>
             </button>
+            <button onclick="window.setTab('users')" id="tab-users" class="hidden snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-md">
+                <span class="text-lg">👥</span><span>Pengguna</span>
+            </button>
         </nav>
 
         <main class="flex-1 px-5 pt-2 pb-24 overflow-y-auto">
@@ -273,7 +276,7 @@
                     <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 text-xl">🔐</div>
                     <h3 class="text-xl font-bold text-slate-800">Login Panitia</h3>
                 </div>
-                <p id="adminLoginReason" class="text-xs text-slate-500 mb-5 font-medium">Masuk dengan akun panitia untuk membuka fitur ini.</p>
+                <p id="adminLoginReason" class="text-xs text-slate-500 mb-5 font-medium">Masuk dengan akun panitia / petugas.</p>
                 <div class="space-y-3 mb-3">
                     <div>
                         <label for="adminEmail" class="block text-xs font-bold text-slate-500 mb-1 ml-1">Email</label>
@@ -288,6 +291,119 @@
                 <div class="flex gap-3 mt-4">
                     <button onclick="window.cancelAdminLogin()" class="flex-1 py-3.5 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors">Batal</button>
                     <button id="adminLoginBtn" onclick="window.submitAdminLogin()" class="flex-1 py-3.5 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 shadow-lg shadow-red-200 transition-colors">Masuk</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="userModal" class="fixed inset-0 z-[9400] bg-slate-900/60 hidden backdrop-blur-sm transition-all duration-300 opacity-0 overflow-y-auto">
+        <div class="min-h-[100dvh] flex px-4 py-12">
+            <div class="bg-white w-full max-w-md rounded-[2rem] p-6 shadow-2xl transform scale-95 transition-transform duration-300 m-auto">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-xl">👤</div>
+                    <h3 id="userModalTitle" class="text-xl font-bold text-slate-800">Tambah Akun</h3>
+                </div>
+                <div class="space-y-3">
+                    <div>
+                        <label for="umName" class="block text-xs font-bold text-slate-500 mb-1 ml-1">Nama Petugas</label>
+                        <input id="umName" type="text" placeholder="contoh: Kak Rina" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:border-red-400">
+                    </div>
+                    <div>
+                        <label for="umEmail" class="block text-xs font-bold text-slate-500 mb-1 ml-1">Email (untuk login)</label>
+                        <input id="umEmail" type="email" autocomplete="off" placeholder="petugas@contoh.com" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:border-red-400">
+                    </div>
+                    <div id="umPasswordWrap">
+                        <label for="umPassword" class="block text-xs font-bold text-slate-500 mb-1 ml-1">Password Awal (min. 6 karakter)</label>
+                        <div class="flex gap-2">
+                            <input id="umPassword" type="text" autocomplete="new-password" placeholder="password awal" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:border-red-400 font-mono">
+                            <button type="button" onclick="window.generateUserPassword()" class="shrink-0 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-600" title="Buat password acak">🎲 Acak</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="umRole" class="block text-xs font-bold text-slate-500 mb-1 ml-1">Peran</label>
+                        <select id="umRole" onchange="window.onUserRoleChange()" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:border-red-400">
+                            <option value="staff">Petugas (akses sesuai pilihan di bawah)</option>
+                            <option value="admin">Admin (semua akses + kelola pengguna & reset)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <div class="block text-xs font-bold text-slate-500 mb-1 ml-1">Hak Akses</div>
+                        <div id="umPerms" class="grid grid-cols-1 gap-2"></div>
+                    </div>
+                    <label id="umActiveWrap" class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer">
+                        <input id="umActive" type="checkbox" class="w-4 h-4 accent-emerald-600">
+                        <span class="text-sm font-bold text-slate-700">Akun aktif (boleh login)</span>
+                    </label>
+                </div>
+                <div id="umError" class="hidden text-xs font-bold text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2.5 mt-3"></div>
+                <div class="flex gap-3 mt-5">
+                    <button onclick="window.closeModal('userModal')" class="flex-1 py-3.5 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors">Batal</button>
+                    <button id="umSaveBtn" onclick="window.saveUser()" class="flex-1 py-3.5 rounded-xl font-bold text-white bg-slate-800 hover:bg-slate-900 shadow-lg transition-colors">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="passwordModal" class="fixed inset-0 z-[9600] bg-slate-900/60 hidden backdrop-blur-sm transition-all duration-300 opacity-0 overflow-y-auto">
+        <div class="min-h-[100dvh] flex px-4 py-12">
+            <div class="bg-white w-full max-w-md rounded-[2rem] p-6 shadow-2xl transform scale-95 transition-transform duration-300 m-auto">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-xl">🔑</div>
+                    <h3 class="text-xl font-bold text-slate-800">Ganti Password Saya</h3>
+                </div>
+                <div class="space-y-3">
+                    <div>
+                        <label for="pwCurrent" class="block text-xs font-bold text-slate-500 mb-1 ml-1">Password Lama</label>
+                        <input id="pwCurrent" type="password" autocomplete="current-password" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:border-red-400">
+                    </div>
+                    <div>
+                        <label for="pwNew" class="block text-xs font-bold text-slate-500 mb-1 ml-1">Password Baru (min. 6 karakter)</label>
+                        <input id="pwNew" type="password" autocomplete="new-password" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:border-red-400">
+                    </div>
+                    <div>
+                        <label for="pwConfirm" class="block text-xs font-bold text-slate-500 mb-1 ml-1">Ulangi Password Baru</label>
+                        <input id="pwConfirm" type="password" autocomplete="new-password" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:border-red-400" onkeydown="if(event.key==='Enter') window.saveOwnPassword()">
+                    </div>
+                </div>
+                <div id="pwError" class="hidden text-xs font-bold text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2.5 mt-3"></div>
+                <div class="flex gap-3 mt-5">
+                    <button onclick="window.closeModal('passwordModal')" class="flex-1 py-3.5 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors">Batal</button>
+                    <button id="pwSaveBtn" onclick="window.saveOwnPassword()" class="flex-1 py-3.5 rounded-xl font-bold text-white bg-amber-600 hover:bg-amber-700 shadow-lg transition-colors">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="accountModal" class="fixed inset-0 z-[9400] bg-slate-900/60 hidden backdrop-blur-sm transition-all duration-300 opacity-0 overflow-y-auto">
+        <div class="min-h-[100dvh] flex px-4 py-12">
+            <div class="bg-white w-full max-w-md rounded-[2rem] p-6 shadow-2xl transform scale-95 transition-transform duration-300 m-auto">
+                <div id="accountModalBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="resetCheckinModal" class="fixed inset-0 z-[9400] bg-slate-900/60 hidden backdrop-blur-sm transition-all duration-300 opacity-0 overflow-y-auto">
+        <div class="min-h-[100dvh] flex px-4 py-12">
+            <div class="bg-white w-full max-w-md rounded-[2rem] p-6 shadow-2xl transform scale-95 transition-transform duration-300 m-auto">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-xl">🔄</div>
+                    <h3 class="text-xl font-bold text-slate-800">Reset Data Check-in</h3>
+                </div>
+                <p class="text-xs text-slate-500 mb-4 font-medium">Data <b>pendaftaran peserta tetap tersimpan</b> (<span id="rcParticipants">0</span> peserta) beserta tiket & QR-nya. Pilih data yang ingin dikosongkan:</p>
+                <div class="space-y-2">
+                    <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer"><input id="rcAttendance" type="checkbox" checked class="w-4 h-4 accent-amber-600"><span class="text-sm font-bold text-slate-700 flex-1">📋 Absensi / Check-in</span><span id="rcAttendanceCount" class="text-xs font-bold text-slate-400">0</span></label>
+                    <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer"><input id="rcGifts" type="checkbox" class="w-4 h-4 accent-amber-600"><span class="text-sm font-bold text-slate-700 flex-1">🎁 Pengambilan Hadiah</span><span id="rcGiftsCount" class="text-xs font-bold text-slate-400">0</span></label>
+                    <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer"><input id="rcDraws" type="checkbox" class="w-4 h-4 accent-amber-600"><span class="text-sm font-bold text-slate-700 flex-1">🎰 Pemenang Undian</span><span id="rcDrawsCount" class="text-xs font-bold text-slate-400">0</span></label>
+                </div>
+                <div class="mt-4">
+                    <label for="rcConfirm" class="block text-xs font-bold text-slate-500 mb-1 ml-1">Ketik <b>RESET</b> untuk konfirmasi</label>
+                    <input id="rcConfirm" type="text" autocomplete="off" placeholder="RESET" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:border-red-400 font-mono uppercase">
+                </div>
+                <p class="text-[10px] text-slate-400 mt-2 font-medium">💡 Sebaiknya Download data Absen/Hadiah/Undian dulu sebagai cadangan. Data yang dikosongkan tidak bisa dikembalikan.</p>
+                <div id="rcError" class="hidden text-xs font-bold text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2.5 mt-3"></div>
+                <div class="flex gap-3 mt-5">
+                    <button onclick="window.closeModal('resetCheckinModal')" class="flex-1 py-3.5 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors">Batal</button>
+                    <button id="rcBtn" onclick="window.doResetCheckin()" class="flex-1 py-3.5 rounded-xl font-bold text-white bg-amber-600 hover:bg-amber-700 shadow-lg transition-colors">Reset Sekarang</button>
                 </div>
             </div>
         </div>
@@ -321,134 +437,454 @@
             isAdminAuthenticated: false 
         };
 
-        // ===================== LOGIN PANITIA (FIREBASE AUTH) =====================
-        // state.isAdminAuthenticated hanya untuk tampilan UI.
-        // Keamanan sebenarnya ada di Firebase Realtime Database Rules (hanya UID di /admins yang boleh menulis).
+        // ===================== AKUN PANITIA & HAK AKSES (FIREBASE AUTH) =====================
+        // Tampilan UI mengikuti hak akses akun. Keamanan sebenarnya ditegakkan oleh
+        // Firebase Realtime Database Rules (lihat database.rules.json).
+        //   /users/{uid}  -> { name, email, role: 'admin'|'staff', active, perms: {scan, manual, gift, draw, export} }
+        //   /admins/{uid} -> true  (admin utama lama; tetap berlaku sebagai admin cadangan)
+        const PERMS = [
+            { key: 'scan',   label: 'Scan Absen (kamera)', icon: '📷' },
+            { key: 'manual', label: 'Check-in Manual',     icon: '✍️' },
+            { key: 'gift',   label: 'Hadiah (scan & manual)', icon: '🎁' },
+            { key: 'draw',   label: 'Undian Door Prize',   icon: '🎰' },
+            { key: 'export', label: 'Download / Export Data', icon: '📥' }
+        ];
+        const ALL_PERMS = () => PERMS.reduce((o, p) => { o[p.key] = true; return o; }, {});
+        const TAB_PERMS = { scan: ['scan', 'manual'], gift: ['gift'], draw: ['draw'], users: ['__admin'] };
+        const TAB_LABELS = { scan: 'Absen', gift: 'Hadiah', draw: 'Undian Door Prize', users: 'Pengguna' };
+
         let pendingAdminAction = null;
-        state.adminEmail = '';
+        let profileRef = null, usersRef = null, secondaryApp = null;
+        state.user = null; state.users = []; state.adminEmail = ''; state.editingUid = null;
+        auth.languageCode = 'id';
 
-        const checkIsAdmin = (user) => {
-            if (!user) return Promise.resolve(false);
-            return db.ref('admins/' + user.uid).once('value')
-                .then(snap => snap.val() === true)
-                .catch(() => false);
+        const isAdmin = () => !!(state.user && state.user.active === true && state.user.role === 'admin');
+        const can = (perm) => {
+            if (perm === '__admin') return isAdmin();
+            return !!(state.user && state.user.active === true &&
+                (state.user.role === 'admin' || (state.user.perms && state.user.perms[perm] === true)));
         };
+        const canOpenTab = (t) => !TAB_PERMS[t] || TAB_PERMS[t].some(can);
+        const escHTML = (v) => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const $val = (id) => (document.getElementById(id) || {}).value || '';
 
-        const updateAdminChip = () => {
-            const chip = document.getElementById('adminChip');
-            if (!chip) return;
-            if (state.isAdminAuthenticated) {
-                chip.innerHTML = '✅ ' + (state.adminEmail || 'Panitia') + ' · Keluar';
-                chip.title = 'Login sebagai panitia: ' + state.adminEmail + ' (klik untuk keluar)';
-            } else {
-                chip.innerHTML = '🔐 Login Panitia';
-                chip.title = 'Login panitia';
-            }
-        };
-
-        const openAdminModal = (reason) => {
-            const m = document.getElementById('adminLoginModal');
-            document.getElementById('adminLoginReason').innerText = reason || 'Masuk dengan akun panitia untuk membuka fitur ini.';
-            document.getElementById('adminLoginError').classList.add('hidden');
-            document.getElementById('adminPassword').value = '';
+        const openModalEl = (id) => {
+            const m = document.getElementById(id);
             m.classList.remove('hidden');
             setTimeout(() => {
                 m.classList.remove('opacity-0');
                 const sc = m.querySelector('.transform.scale-95');
                 if (sc) sc.classList.replace('scale-95', 'scale-100');
-                const em = document.getElementById('adminEmail');
-                (em.value ? document.getElementById('adminPassword') : em).focus();
             }, 10);
         };
-
-        const showAdminError = (msg) => {
-            const el = document.getElementById('adminLoginError');
-            el.innerText = msg;
-            el.classList.remove('hidden');
+        const showErr = (id, msg) => {
+            const el = document.getElementById(id);
+            if (!msg) { el.classList.add('hidden'); return; }
+            el.innerText = msg; el.classList.remove('hidden');
         };
 
-        // Jalankan action kalau sudah login panitia; kalau belum, tampilkan form login dulu.
-        window.requireAdmin = (action, reason) => {
-            if (state.isAdminAuthenticated) { action(); return true; }
-            pendingAdminAction = action;
-            openAdminModal(reason ? `🔒 FITUR TERKUNCI — ${reason}. Masuk dengan akun panitia.` : null);
-            return false;
+        const isLegacyAdmin = (uid) => db.ref('admins/' + uid).once('value').then(s => s.val() === true).catch(() => false);
+
+        // Ambil profil + hak akses akun yang login. Admin lama (/admins) otomatis dibuatkan profil.
+        const resolveProfile = async (user) => {
+            if (!user) return null;
+            const legacy = await isLegacyAdmin(user.uid);
+            let p = await db.ref('users/' + user.uid).once('value').then(s => s.val()).catch(() => null);
+            if (!p && legacy) {
+                p = { name: '', email: user.email || '', role: 'admin', active: true, perms: ALL_PERMS(), createdAt: Date.now(), createdBy: 'admin-utama' };
+                try { await db.ref('users/' + user.uid).set(p); } catch (e) { console.error('Gagal membuat profil admin', e); }
+            }
+            if (!p) return null;
+            if (legacy) p = Object.assign({}, p, { role: 'admin', active: true });
+            return Object.assign({ perms: {} }, p, { uid: user.uid, email: p.email || user.email || '', _legacy: legacy });
         };
+
+        const updateAdminChip = () => {
+            const chip = document.getElementById('adminChip');
+            if (!chip) return;
+            if (state.user) {
+                const who = state.user.name || state.user.email || 'Panitia';
+                chip.innerHTML = (isAdmin() ? '🛡️ ' : '✅ ') + escHTML(who) + ' · Akun';
+                chip.title = 'Login sebagai ' + state.user.email + ' (klik untuk menu akun)';
+            } else {
+                chip.innerHTML = '🔐 Login Panitia';
+                chip.title = 'Login panitia / petugas';
+            }
+        };
+
+        const userKey = (u) => JSON.stringify(u ? [u.uid, u.role, u.active, u.perms, u.name] : null);
+
+        const applyUser = (p) => {
+            const prevKey = userKey(state.user);
+            state.user = (p && p.active === true) ? p : null;
+            state.isAdminAuthenticated = !!state.user;
+            state.adminEmail = state.user ? state.user.email : '';
+            updateAdminChip();
+
+            const navUsers = document.getElementById('tab-users');
+            if (navUsers) navUsers.classList.toggle('hidden', !isAdmin());
+
+            if (isAdmin() && !usersRef) {
+                usersRef = db.ref('users');
+                usersRef.on('value', snap => {
+                    const v = snap.val() || {};
+                    state.users = Object.keys(v).map(uid => Object.assign({ perms: {} }, v[uid], { uid }));
+                    if (state.tab === 'users') window.render();
+                }, err => console.error('Gagal memuat daftar pengguna', err));
+            } else if (!isAdmin() && usersRef) {
+                usersRef.off(); usersRef = null; state.users = [];
+            }
+
+            if (prevKey === userKey(state.user) || typeof window.setTab !== 'function') return;
+            if (!canOpenTab(state.tab)) { window.setTab('register'); return; }
+            if (state.tab === 'scan' || state.tab === 'gift') { window.stopScanner(); window.setTab(state.tab); }
+            else if (state.tab !== 'register') window.render();
+        };
+
+        // Pantau perubahan hak akses secara langsung (mis. admin menonaktifkan akun saat acara)
+        const watchProfile = (user) => {
+            if (profileRef) { profileRef.off(); profileRef = null; }
+            if (!user) return;
+            profileRef = db.ref('users/' + user.uid);
+            profileRef.on('value', async () => {
+                if (!auth.currentUser || auth.currentUser.uid !== user.uid) return;
+                const p = await resolveProfile(user);
+                if (!auth.currentUser || auth.currentUser.uid !== user.uid) return;
+                if (!p || p.active !== true) {
+                    if (state.user) alert('⛔ Akses akun Anda dinonaktifkan atau dicabut oleh admin.');
+                    applyUser(null);
+                    auth.signOut().catch(() => {});
+                    return;
+                }
+                applyUser(p);
+            }, () => {});
+        };
+
+        const openAdminModal = (reason) => {
+            document.getElementById('adminLoginReason').innerText = reason || 'Masuk dengan akun panitia / petugas.';
+            showErr('adminLoginError', '');
+            document.getElementById('adminPassword').value = '';
+            openModalEl('adminLoginModal');
+            setTimeout(() => {
+                const em = document.getElementById('adminEmail');
+                (em.value ? document.getElementById('adminPassword') : em).focus();
+            }, 30);
+        };
+        const showAdminError = (msg) => showErr('adminLoginError', msg);
+
+        // Jalankan action bila akun punya akses `perm` (string / array). Belum login -> form login dulu.
+        window.requirePerm = (perm, action, reason) => {
+            if (!state.user) {
+                pendingAdminAction = () => window.requirePerm(perm, action, reason);
+                openAdminModal(reason ? `🔒 FITUR TERKUNCI — ${reason}. Masuk dengan akun panitia / petugas.` : null);
+                return false;
+            }
+            const ok = !perm || (Array.isArray(perm) ? perm.some(can) : can(perm));
+            if (!ok) {
+                alert(`⛔ Akun Anda tidak memiliki akses${reason ? ' untuk ' + reason : ''}.\nHubungi admin untuk meminta akses.`);
+                return false;
+            }
+            action();
+            return true;
+        };
+        window.requireAdmin = (action, reason) => window.requirePerm('__admin', action, reason);
+        window.canAccess = can;
 
         window.cancelAdminLogin = () => {
             pendingAdminAction = null;
             window.closeModal('adminLoginModal');
         };
 
+        const AUTH_ERRORS = {
+            'auth/invalid-credential': '⛔ Email atau password salah.',
+            'auth/invalid-login-credentials': '⛔ Email atau password salah.',
+            'auth/wrong-password': '⛔ Password salah.',
+            'auth/user-not-found': '⛔ Email atau password salah.',
+            'auth/invalid-email': 'Format email tidak valid.',
+            'auth/email-already-in-use': 'Email ini sudah terdaftar di Firebase Authentication. Jika belum muncul di daftar pengguna, hapus akun tersebut di Firebase Console → Authentication → Users, lalu buat ulang di sini.',
+            'auth/weak-password': 'Password terlalu lemah (minimal 6 karakter).',
+            'auth/too-many-requests': 'Terlalu banyak percobaan. Coba lagi beberapa menit lagi.',
+            'auth/network-request-failed': 'Gagal terhubung ke server. Periksa koneksi internet.',
+            'auth/operation-not-allowed': 'Login Email/Password belum diaktifkan di Firebase Console.',
+            'auth/user-disabled': 'Akun ini dinonaktifkan di Firebase.',
+            'auth/requires-recent-login': 'Demi keamanan, silakan keluar lalu login ulang, kemudian coba lagi.'
+        };
+        const authErrMsg = (e) => {
+            const code = (e && e.code) || '';
+            if (/permission/i.test(code + ' ' + ((e && e.message) || ''))) return '⛔ Ditolak server (Database Rules). Pastikan Rules terbaru sudah di-Publish dan akun Anda admin.';
+            return AUTH_ERRORS[code] || ('Gagal: ' + ((e && e.message) || code));
+        };
+
         window.submitAdminLogin = async () => {
-            const email = document.getElementById('adminEmail').value.trim();
-            const pass = document.getElementById('adminPassword').value;
+            const email = $val('adminEmail').trim();
+            const pass = $val('adminPassword');
             const btn = document.getElementById('adminLoginBtn');
             if (!email || !pass) { showAdminError('Isi email dan password.'); return; }
 
             btn.disabled = true; btn.innerText = 'Memeriksa...';
             try {
                 const cred = await auth.signInWithEmailAndPassword(email, pass);
-                const ok = await checkIsAdmin(cred.user);
-                if (!ok) {
+                const p = await resolveProfile(cred.user);
+                if (!p || p.active !== true) {
                     await auth.signOut();
-                    showAdminError('⛔ Akun ini bukan panitia (belum terdaftar di daftar admin).');
+                    showAdminError(p ? '⛔ Akun ini sedang dinonaktifkan. Hubungi admin.' : '⛔ Akun ini belum diberi akses aplikasi. Hubungi admin.');
                     return;
                 }
-                state.isAdminAuthenticated = true;
-                state.adminEmail = cred.user.email || '';
-                updateAdminChip();
+                applyUser(p);
                 document.getElementById('adminPassword').value = '';
                 window.closeModal('adminLoginModal');
                 const act = pendingAdminAction; pendingAdminAction = null;
-                if (act) act(); else window.render();
+                if (act) act(); else if (state.tab !== 'register') window.render();
             } catch (e) {
-                const code = (e && e.code) || '';
-                const msgs = {
-                    'auth/invalid-credential': '⛔ Email atau password salah.',
-                    'auth/wrong-password': '⛔ Email atau password salah.',
-                    'auth/user-not-found': '⛔ Email atau password salah.',
-                    'auth/invalid-email': 'Format email tidak valid.',
-                    'auth/too-many-requests': 'Terlalu banyak percobaan gagal. Coba lagi beberapa menit lagi.',
-                    'auth/network-request-failed': 'Gagal terhubung ke server. Periksa koneksi internet.',
-                    'auth/operation-not-allowed': 'Login Email/Password belum diaktifkan di Firebase Console.',
-                    'auth/user-disabled': 'Akun ini dinonaktifkan.'
-                };
-                showAdminError(msgs[code] || ('Gagal login: ' + (e && e.message ? e.message : code)));
+                showAdminError(authErrMsg(e));
             } finally {
                 btn.disabled = false; btn.innerText = 'Masuk';
             }
         };
 
         window.adminLogout = async () => {
-            if (!confirm('Keluar dari mode panitia?')) return;
+            if (!confirm('Keluar dari akun panitia?')) return;
+            window.closeModal('accountModal');
             try { await auth.signOut(); } catch (e) { console.error(e); }
         };
 
-        window.adminChipClick = () => {
-            if (state.isAdminAuthenticated) window.adminLogout();
-            else window.requireAdmin(() => window.render());
+        const permChipsHTML = (u) => {
+            if (u.role === 'admin') return '<span class="text-[10px] bg-purple-50 text-purple-700 border border-purple-100 px-2 py-0.5 rounded-md font-bold">⭐ Semua akses</span>';
+            const on = PERMS.filter(p => u.perms && u.perms[p.key] === true);
+            if (on.length === 0) return '<span class="text-[10px] bg-slate-100 text-slate-400 px-2 py-0.5 rounded-md font-bold">Belum ada akses</span>';
+            return on.map(p => `<span class="text-[10px] bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 rounded-md font-bold">${p.icon} ${p.label}</span>`).join('');
         };
 
-        // Sesi login tersimpan di browser: setelah refresh, panitia tidak perlu login ulang.
-        auth.onAuthStateChanged(async (user) => {
-            const ok = await checkIsAdmin(user);
-            const wasAdmin = state.isAdminAuthenticated;
-            state.isAdminAuthenticated = ok;
-            state.adminEmail = ok && user ? (user.email || '') : '';
-            updateAdminChip();
-            if (wasAdmin && !ok && ['scan', 'gift', 'draw'].includes(state.tab)) {
-                window.setTab('register');
-            } else if (wasAdmin !== ok && typeof window.render === 'function') {
-                if (state.tab !== 'register') window.render();
+        // Menu akun (klik tombol di header)
+        window.adminChipClick = () => {
+            if (!state.user) { window.requirePerm(null, () => { if (state.tab !== 'register') window.render(); }); return; }
+            const u = state.user;
+            document.getElementById('accountModalBody').innerHTML = `
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-full ${isAdmin() ? 'bg-purple-100' : 'bg-emerald-100'} flex items-center justify-center text-2xl">${isAdmin() ? '🛡️' : '👤'}</div>
+                    <div class="min-w-0">
+                        <div class="font-bold text-slate-800 text-lg leading-tight truncate">${escHTML(u.name || u.email)}</div>
+                        <div class="text-xs text-slate-500 truncate">${escHTML(u.email)} · ${isAdmin() ? 'Admin' : 'Petugas'}</div>
+                    </div>
+                </div>
+                <div class="text-xs font-bold text-slate-500 mb-2 ml-1">Hak akses Anda</div>
+                <div class="flex flex-wrap gap-1.5 mb-6">${permChipsHTML(u)}</div>
+                <div class="space-y-2">
+                    ${isAdmin() ? `<button onclick="window.closeModal('accountModal'); window.setTab('users')" class="w-full py-3 rounded-xl font-bold text-white bg-slate-800 hover:bg-slate-900 transition-colors">👥 Kelola Pengguna</button>` : ''}
+                    <button onclick="window.closeModal('accountModal'); window.openOwnPassword()" class="w-full py-3 rounded-xl font-bold text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-colors">🔑 Ganti Password Saya</button>
+                    <button onclick="window.adminLogout()" class="w-full py-3 rounded-xl font-bold text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors">🚪 Keluar</button>
+                    <button onclick="window.closeModal('accountModal')" class="w-full py-3 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors">Tutup</button>
+                </div>`;
+            openModalEl('accountModal');
+        };
+
+        // ---------- Ganti password sendiri ----------
+        window.openOwnPassword = () => {
+            if (!state.user) return;
+            ['pwCurrent', 'pwNew', 'pwConfirm'].forEach(id => document.getElementById(id).value = '');
+            showErr('pwError', '');
+            openModalEl('passwordModal');
+        };
+        window.saveOwnPassword = async () => {
+            const u = auth.currentUser;
+            if (!u) return;
+            const cur = $val('pwCurrent'), nw = $val('pwNew'), cf = $val('pwConfirm');
+            if (!cur || !nw) { showErr('pwError', 'Isi password lama dan password baru.'); return; }
+            if (nw.length < 6) { showErr('pwError', 'Password baru minimal 6 karakter.'); return; }
+            if (nw !== cf) { showErr('pwError', 'Ulangi password baru tidak sama.'); return; }
+            const btn = document.getElementById('pwSaveBtn');
+            btn.disabled = true; btn.innerText = 'Menyimpan...';
+            try {
+                const cred = firebase.auth.EmailAuthProvider.credential(u.email, cur);
+                await u.reauthenticateWithCredential(cred);
+                await u.updatePassword(nw);
+                window.closeModal('passwordModal');
+                alert('✅ Password berhasil diganti. Gunakan password baru untuk login berikutnya.');
+            } catch (e) {
+                const c = (e && e.code) || '';
+                showErr('pwError', (c === 'auth/wrong-password' || c === 'auth/invalid-credential' || c === 'auth/invalid-login-credentials') ? '⛔ Password lama salah.' : authErrMsg(e));
+            } finally {
+                btn.disabled = false; btn.innerText = 'Simpan';
             }
+        };
+
+        // ---------- MANAJEMEN PENGGUNA (khusus admin) ----------
+        // Akun baru dibuat lewat instance Firebase kedua supaya admin tidak ikut ter-logout.
+        const getSecondaryAuth = () => {
+            if (!secondaryApp) {
+                secondaryApp = (firebase.apps || []).find(a => a.name === 'pembuatAkun') || firebase.initializeApp(firebaseConfig, 'pembuatAkun');
+            }
+            return secondaryApp.auth();
+        };
+
+        window.generateUserPassword = () => {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+            const arr = new Uint32Array(10);
+            (window.crypto || window.msCrypto).getRandomValues(arr);
+            document.getElementById('umPassword').value = Array.from(arr, n => chars[n % chars.length]).join('');
+        };
+
+        window.onUserRoleChange = () => {
+            const isAdm = $val('umRole') === 'admin';
+            PERMS.forEach(p => {
+                const cb = document.getElementById('umPerm-' + p.key);
+                if (!cb) return;
+                if (isAdm) cb.checked = true;
+                cb.disabled = isAdm;
+                cb.closest('label').classList.toggle('opacity-60', isAdm);
+            });
+        };
+
+        window.openUserModal = (uid) => {
+            if (!isAdmin()) return;
+            const u = uid ? state.users.find(x => x.uid === uid) : null;
+            if (uid && !u) return;
+            state.editingUid = u ? u.uid : null;
+            document.getElementById('userModalTitle').innerText = u ? 'Edit Akun & Akses' : 'Tambah Akun Baru';
+            document.getElementById('umName').value = u ? (u.name || '') : '';
+            const em = document.getElementById('umEmail');
+            em.value = u ? (u.email || '') : '';
+            em.disabled = !!u;
+            em.classList.toggle('opacity-60', !!u);
+            document.getElementById('umPassword').value = '';
+            document.getElementById('umPasswordWrap').classList.toggle('hidden', !!u);
+            document.getElementById('umActiveWrap').classList.toggle('hidden', !u);
+            document.getElementById('umActive').checked = u ? u.active === true : true;
+            document.getElementById('umRole').value = u && u.role === 'admin' ? 'admin' : 'staff';
+            document.getElementById('umPerms').innerHTML = PERMS.map(p => `
+                <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer">
+                    <input id="umPerm-${p.key}" type="checkbox" class="w-4 h-4 accent-emerald-600" ${u ? (u.perms && u.perms[p.key] === true ? 'checked' : '') : (p.key === 'scan' || p.key === 'manual' ? 'checked' : '')}>
+                    <span class="text-sm font-bold text-slate-700">${p.icon} ${p.label}</span>
+                </label>`).join('');
+            window.onUserRoleChange();
+            showErr('umError', '');
+            if (!u) window.generateUserPassword();
+            openModalEl('userModal');
+        };
+
+        window.saveUser = async () => {
+            if (!isAdmin()) return;
+            const uid = state.editingUid;
+            const name = $val('umName').trim().slice(0, 80);
+            const role = $val('umRole') === 'admin' ? 'admin' : 'staff';
+            const perms = {};
+            PERMS.forEach(p => { perms[p.key] = role === 'admin' ? true : !!(document.getElementById('umPerm-' + p.key) || {}).checked; });
+            const btn = document.getElementById('umSaveBtn');
+            showErr('umError', '');
+
+            if (uid) {
+                const active = document.getElementById('umActive').checked;
+                if (uid === state.user.uid && (role !== 'admin' || !active)) {
+                    showErr('umError', 'Anda tidak bisa menurunkan peran atau menonaktifkan akun Anda sendiri.');
+                    return;
+                }
+                btn.disabled = true; btn.innerText = 'Menyimpan...';
+                try {
+                    await db.ref('users/' + uid).update({ name, role, perms, active, updatedAt: Date.now(), updatedBy: state.user.email });
+                    window.closeModal('userModal');
+                } catch (e) { showErr('umError', authErrMsg(e)); }
+                finally { btn.disabled = false; btn.innerText = 'Simpan'; }
+                return;
+            }
+
+            const email = $val('umEmail').trim().toLowerCase();
+            const pw = $val('umPassword');
+            if (!email) { showErr('umError', 'Isi email akun.'); return; }
+            if (pw.length < 6) { showErr('umError', 'Password awal minimal 6 karakter.'); return; }
+            if (!Object.values(perms).some(Boolean)) {
+                if (!confirm('Akun ini belum diberi hak akses apa pun. Tetap buat akun?')) return;
+            }
+
+            btn.disabled = true; btn.innerText = 'Membuat akun...';
+            let newUid = null;
+            try {
+                const sec = getSecondaryAuth();
+                try { await sec.setPersistence(firebase.auth.Auth.Persistence.NONE); } catch (e) {}
+                const cred = await sec.createUserWithEmailAndPassword(email, pw);
+                newUid = cred.user.uid;
+                await sec.signOut().catch(() => {});
+                await db.ref('users/' + newUid).set({ name, email, role, perms, active: true, createdAt: Date.now(), createdBy: state.user.email });
+                window.closeModal('userModal');
+                alert(`✅ Akun berhasil dibuat.\n\nEmail    : ${email}\nPassword : ${pw}\n\nBerikan data login ini ke petugas. Petugas bisa mengganti password sendiri lewat tombol akun di pojok kanan atas.`);
+            } catch (e) {
+                showErr('umError', newUid
+                    ? 'Akun login sudah dibuat, tetapi hak aksesnya gagal disimpan: ' + authErrMsg(e)
+                    : authErrMsg(e));
+            } finally {
+                btn.disabled = false; btn.innerText = 'Simpan';
+            }
+        };
+
+        window.toggleUserActive = async (uid) => {
+            if (!isAdmin()) return;
+            const u = state.users.find(x => x.uid === uid);
+            if (!u) return;
+            if (uid === state.user.uid) { alert('Anda tidak bisa menonaktifkan akun Anda sendiri.'); return; }
+            const next = u.active !== true;
+            if (!confirm(`${next ? 'Aktifkan' : 'Nonaktifkan'} akun ${u.email}?${next ? '' : '\n\nAkun ini tidak bisa memakai fitur panitia sampai diaktifkan lagi.'}`)) return;
+            try { await db.ref('users/' + uid).update({ active: next, updatedAt: Date.now(), updatedBy: state.user.email }); }
+            catch (e) { alert(authErrMsg(e)); }
+        };
+
+        window.resetUserPassword = async (uid) => {
+            if (!isAdmin()) return;
+            const u = state.users.find(x => x.uid === uid);
+            if (!u || !u.email) return;
+            if (!confirm(`Kirim link reset password ke ${u.email}?\n\nPemilik akun akan menerima email berisi link untuk membuat password baru.`)) return;
+            try {
+                await auth.sendPasswordResetEmail(u.email);
+                alert(`📧 Link reset password sudah dikirim ke ${u.email}.\nMinta petugas cek kotak masuk / folder Spam.`);
+            } catch (e) { alert(authErrMsg(e)); }
+        };
+
+        // ---------- Reset data check-in (data pendaftaran tetap) ----------
+        window.openResetCheckin = () => {
+            window.requireAdmin(() => {
+                document.getElementById('rcParticipants').innerText = state.participants.length;
+                document.getElementById('rcAttendanceCount').innerText = state.attendance.length + ' data';
+                document.getElementById('rcGiftsCount').innerText = state.gifts.length + ' data';
+                document.getElementById('rcDrawsCount').innerText = state.drawWinners.length + ' data';
+                document.getElementById('rcAttendance').checked = true;
+                document.getElementById('rcGifts').checked = false;
+                document.getElementById('rcDraws').checked = false;
+                document.getElementById('rcConfirm').value = '';
+                showErr('rcError', '');
+                openModalEl('resetCheckinModal');
+            }, 'Reset Data Check-in');
+        };
+
+        window.doResetCheckin = async () => {
+            if (!isAdmin()) return;
+            const targets = [];
+            if (document.getElementById('rcAttendance').checked) targets.push(['attendance', 'Absensi']);
+            if (document.getElementById('rcGifts').checked) targets.push(['gifts', 'Hadiah']);
+            if (document.getElementById('rcDraws').checked) targets.push(['drawWinners', 'Undian']);
+            if (targets.length === 0) { showErr('rcError', 'Pilih minimal satu data yang akan di-reset.'); return; }
+            if ($val('rcConfirm').trim().toUpperCase() !== 'RESET') { showErr('rcError', 'Ketik RESET untuk konfirmasi.'); return; }
+            const btn = document.getElementById('rcBtn');
+            btn.disabled = true; btn.innerText = 'Memproses...';
+            try {
+                await Promise.all(targets.map(([path]) => db.ref(path).set(null)));
+                window.closeModal('resetCheckinModal');
+                alert(`✅ Reset selesai: ${targets.map(t => t[1]).join(', ')}.\n\nData pendaftaran (${state.participants.length} peserta) tetap tersimpan. Peserta bisa check-in ulang memakai tiket yang sama.`);
+            } catch (e) {
+                showErr('rcError', authErrMsg(e));
+            } finally {
+                btn.disabled = false; btn.innerText = 'Reset Sekarang';
+            }
+        };
+
+        // Sesi login tersimpan di browser: setelah refresh, petugas tidak perlu login ulang.
+        auth.onAuthStateChanged((user) => {
+            if (!user) { watchProfile(null); applyUser(null); return; }
+            watchProfile(user);
         });
 
         // Tampilkan pesan jelas kalau penulisan ditolak Database Rules
         const handleWriteError = (e) => {
             console.error(e);
             const denied = e && /permission/i.test(e.code || e.message || '');
-            alert(denied ? '⛔ Ditolak server: hanya panitia yang login yang boleh melakukan ini.' : ('Gagal menyimpan: ' + (e && e.message ? e.message : e)));
+            alert(denied ? '⛔ Ditolak server: akun Anda tidak memiliki akses untuk tindakan ini.' : ('Gagal menyimpan: ' + (e && e.message ? e.message : e)));
         };
         // ========================================================================
 
@@ -644,7 +1080,8 @@
         };
 
         window.secureProcess = (pid) => {
-            window.requireAdmin(() => window.processScannedID(pid), 'Check-in / Ambil Hadiah');
+            const isGift = state.tab === 'gift';
+            window.requirePerm(isGift ? 'gift' : 'manual', () => window.processScannedID(pid), isGift ? 'Ambil Hadiah' : 'Check-in Manual');
         };
 
         window.processScannedID = (pid) => {
@@ -686,6 +1123,7 @@
 
         window.initScanner = () => {
             if(state.scanner) return;
+            if(!document.getElementById('reader')) return; // akun tanpa akses kamera
             
             const config = { 
                 fps: 10, 
@@ -701,7 +1139,8 @@
                 const p = state.participants.find(x => x.qrCode === decodedText);
                 
                 if(p) {
-                    window.processScannedID(p.id); 
+                    if (!can(state.tab === 'gift' ? 'gift' : 'scan')) { beep('fail'); window.showScanResult(false, "⛔ Akun Anda tidak punya akses scan"); }
+                    else window.processScannedID(p.id); 
                 } else { 
                     beep('fail'); window.showScanResult(false, "❌ QR Code Tidak Dikenali"); 
                 }
@@ -779,28 +1218,27 @@
         }
 
         window.setTab = (t) => {
-            if (t === 'scan' || t === 'gift' || t === 'draw') {
-                if (state.tab !== t && !state.isAdminAuthenticated) {
-                    const label = t === 'gift' ? 'Hadiah' : (t === 'draw' ? 'Undian Door Prize' : 'Absen');
-                    window.requireAdmin(() => window.setTab(t), `Menu ${label}`);
-                    return;
-                }
+            if (TAB_PERMS[t] && state.tab !== t && !canOpenTab(t)) {
+                window.requirePerm(TAB_PERMS[t], () => window.setTab(t), `Menu ${TAB_LABELS[t]}`);
+                return;
             }
 
             if((state.tab === 'scan' || state.tab === 'gift') && (t !== 'scan' && t !== 'gift')) window.stopScanner();
             state.tab = t;
             
-            const tabs = ['register','find','scan','gift','draw','data'];
+            const tabs = ['register','find','scan','gift','draw','data','users'];
             tabs.forEach(x => {
                 const btn = document.getElementById(`tab-${x}`);
                 if(x === t) {
                     let bgCol = 'bg-red-600';
                     if (t === 'draw') bgCol = 'bg-purple-600'; 
+                    if (t === 'users') bgCol = 'bg-slate-800';
                     
                     btn.className = `snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-lg ${bgCol} text-white -translate-y-1`;
                 } else {
                     btn.className = "snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-sm bg-white text-slate-400 hover:text-slate-600 hover:bg-slate-50";
                 }
+                if (x === 'users' && !isAdmin()) btn.classList.add('hidden');
             });
             window.render();
             
@@ -868,6 +1306,7 @@
         }
 
         window.spinDoorPrize = () => {
+            if (!can('draw')) { window.requirePerm('draw', () => {}, 'Undian Door Prize'); return; }
             const selectedClass = document.getElementById('drawClass').value;
             
             let pool = state.attendance.filter(a => !state.drawWinners.some(w => w.participantId === a.participantId));
@@ -1040,6 +1479,8 @@
                 const label = isGift ? 'Scanner Hadiah' : 'Scanner Kehadiran';
                 const hint = isGift ? 'Arahkan QR Code tiket untuk klaim hadiah' : 'Arahkan QR Code tiket untuk check-in';
                 const iconColor = isGift ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600';
+                const canCam = can(isGift ? 'gift' : 'scan');
+                const canMan = can(isGift ? 'gift' : 'manual');
 
                 root.innerHTML = `
                     <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 text-center mb-6 max-w-2xl mx-auto w-full">
@@ -1052,26 +1493,33 @@
                         
                         <div id="scanRes" class="hidden"></div>
                         
+                        ${canCam ? `
                         <div id="reader" class="mb-2 mx-auto w-full max-w-sm"></div>
                         
                         <p class="text-xs font-medium text-slate-400 px-4 mt-2">${hint}</p>
-                        <p class="text-[10px] font-bold text-amber-600 bg-amber-50 px-3 py-2.5 rounded-xl mt-3 border border-amber-200 shadow-sm md:max-w-md md:mx-auto">
+                        ${canMan ? `<p class="text-[10px] font-bold text-amber-600 bg-amber-50 px-3 py-2.5 rounded-xl mt-3 border border-amber-200 shadow-sm md:max-w-md md:mx-auto">
                             💡 Jika kamera tidak bisa diakses di laptop, Anda tetap bisa absensi menggunakan fasilitas <span class="text-emerald-700">"Pencarian Manual"</span> di bawah ini.
-                        </p>
+                        </p>` : ''}
+                        ` : `
+                        <div class="text-sm font-bold text-slate-500 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl px-4 py-6">
+                            📵 Akun Anda tidak memiliki akses scan kamera.${canMan ? '<br><span class="text-xs font-medium">Gunakan Pencarian Manual di bawah.</span>' : ''}
+                        </div>`}
                     </div>
                     
+                    ${canMan ? `
                     <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 max-w-4xl mx-auto w-full">
                         <div class="flex items-center justify-between mb-4 md:max-w-xl md:mx-auto">
                             <div class="text-sm font-bold text-slate-700 flex items-center gap-2">
                                 <span class="text-slate-400">${state.isAdminAuthenticated ? '✅' : '🔒'}</span> Pencarian Manual
                             </div>
-                            <div class="text-[9px] font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded-md uppercase tracking-wider">Admin Only</div>
+                            <div class="text-[9px] font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded-md uppercase tracking-wider">Petugas</div>
                         </div>
                         <input oninput="window.handleSearch(this)" type="text" placeholder="Ketik nama peserta..." class="w-full max-w-xl mx-auto block p-3.5 bg-slate-50 border border-slate-200 rounded-xl mb-3 text-sm font-medium text-slate-700 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-slate-400">
                         <div id="manual-list" class="max-h-[50vh] overflow-y-auto no-scrollbar rounded-xl border border-slate-100 bg-slate-50/50 p-2 grid grid-cols-1 md:grid-cols-2 gap-2">
                             <div class="text-center text-slate-400 py-6 text-sm md:col-span-full">Ketik untuk mencari data</div>
                         </div>
                     </div>
+                    ` : ''}
                 `;
             } 
             else if (state.tab === 'draw') {
@@ -1117,6 +1565,66 @@
                     </div>
                 `;
                 setTimeout(() => { window.renderDrawWinners(); }, 50);
+            } else if (state.tab === 'users') {
+                if (!isAdmin()) {
+                    root.innerHTML = `<div class="text-center py-12 bg-white rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 max-w-3xl mx-auto w-full">🔒 Menu ini khusus admin.</div>`;
+                    return;
+                }
+                const me = state.user.uid;
+                const list = state.users.slice().sort((a, b) => {
+                    if (a.uid === me) return -1; if (b.uid === me) return 1;
+                    if (a.role !== b.role) return a.role === 'admin' ? -1 : 1;
+                    return (a.name || a.email || '').localeCompare(b.name || b.email || '');
+                });
+                const activeCount = list.filter(u => u.active === true).length;
+                root.innerHTML = `
+                    <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 mb-4 max-w-5xl mx-auto w-full">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-2xl shadow-inner">👥</div>
+                                <div>
+                                    <h3 class="font-bold text-xl text-slate-800 leading-tight">Manajemen Pengguna</h3>
+                                    <p class="text-[11px] text-slate-500 font-medium">${list.length} akun · ${activeCount} aktif</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.openOwnPassword()" class="flex-1 md:flex-none px-4 py-3 rounded-xl text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-colors">🔑 Password Saya</button>
+                                <button onclick="window.openUserModal()" class="flex-1 md:flex-none px-4 py-3 rounded-xl text-xs font-bold text-white bg-slate-800 hover:bg-slate-900 shadow-lg transition-colors">➕ Tambah Akun</button>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-semibold text-sky-700 bg-sky-50 border border-sky-100 rounded-xl px-3 py-2.5 mt-4 leading-relaxed">
+                            💡 Password akun lain tidak bisa dilihat atau diubah langsung dari aplikasi. Gunakan <b>📧 Reset Password</b> untuk mengirim link pembuatan password baru ke email petugas. Untuk mencabut akses, gunakan <b>⏸ Nonaktifkan</b>.
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pb-8 max-w-5xl mx-auto w-full">
+                        ${list.length === 0 ? `<div class="text-center py-10 bg-white rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 text-sm md:col-span-full">Memuat daftar pengguna...</div>` : ''}
+                        ${list.map(u => {
+                            const self = u.uid === me;
+                            const uidAttr = escHTML(u.uid);
+                            return `
+                            <div class="bg-white p-4 rounded-2xl shadow-sm border ${u.active === true ? 'border-slate-100' : 'border-slate-200 bg-slate-50 opacity-75'}">
+                                <div class="flex justify-between items-start gap-2 mb-2">
+                                    <div class="min-w-0">
+                                        <div class="font-bold text-slate-800 text-sm truncate">${escHTML(u.name || '(tanpa nama)')} ${self ? '<span class="text-[9px] bg-slate-800 text-white px-1.5 py-0.5 rounded-md ml-1">ANDA</span>' : ''}</div>
+                                        <div class="text-[11px] text-slate-500 truncate">${escHTML(u.email || '-')}</div>
+                                    </div>
+                                    <div class="flex flex-col items-end gap-1 shrink-0">
+                                        <span class="text-[9px] font-bold px-2 py-0.5 rounded-md ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-600'}">${u.role === 'admin' ? '🛡️ ADMIN' : 'PETUGAS'}</span>
+                                        <span class="text-[9px] font-bold px-2 py-0.5 rounded-md ${u.active === true ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'}">${u.active === true ? '● AKTIF' : '○ NONAKTIF'}</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-1 mb-3">${permChipsHTML(u)}</div>
+                                <div class="grid grid-cols-3 gap-1.5">
+                                    <button onclick="window.openUserModal('${uidAttr}')" class="py-2 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">✏️ Edit Akses</button>
+                                    <button onclick="window.resetUserPassword('${uidAttr}')" class="py-2 rounded-lg text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-100 hover:bg-sky-100 transition-colors">📧 Reset Password</button>
+                                    ${self
+                                        ? `<button onclick="window.openOwnPassword()" class="py-2 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-100 hover:bg-amber-100 transition-colors">🔑 Ganti Password</button>`
+                                        : `<button onclick="window.toggleUserActive('${uidAttr}')" class="py-2 rounded-lg text-[10px] font-bold ${u.active === true ? 'bg-red-50 text-red-600 border border-red-100 hover:bg-red-100' : 'bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100'} transition-colors">${u.active === true ? '⏸ Nonaktifkan' : '▶ Aktifkan'}</button>`}
+                                </div>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                `;
             } else if (state.tab === 'data') {
                 const isGiftView = state.dataViewMode === 'gifts';
                 const isDrawView = state.dataViewMode === 'draws';
@@ -1182,7 +1690,10 @@
                             </div>
                         `).join('')}
                         
-                        <div class="mt-8 text-center pb-8 md:col-span-full w-full">
+                        <div class="mt-8 text-center pb-8 md:col-span-full w-full flex flex-wrap justify-center gap-2">
+                            <button onclick="window.openResetCheckin()" class="text-[10px] text-amber-600 font-bold border border-amber-200 bg-amber-50 px-4 py-2 rounded-full hover:bg-amber-100 transition-colors">
+                                🔄 Reset Data Check-in (peserta tetap)
+                            </button>
                             <button onclick="window.resetData()" class="text-[10px] text-slate-400 font-bold border border-slate-200 px-4 py-2 rounded-full hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors opacity-70 hover:opacity-100">
                                 ⚠️ Hapus Seluruh Database
                             </button>
@@ -1330,8 +1841,8 @@
         };
 
         window.exportData = (type) => {
-            if (!state.isAdminAuthenticated) {
-                window.requireAdmin(() => window.exportData(type), 'Download Data');
+            if (!can('export')) {
+                window.requirePerm('export', () => window.exportData(type), 'Download Data');
                 return;
             }
 
@@ -1385,7 +1896,7 @@
         };
         
         window.triggerImport = () => {
-            if (!state.isAdminAuthenticated) {
+            if (!isAdmin()) {
                 window.requireAdmin(() => {
                     window.render();
                     alert('✅ Login berhasil. Klik tombol "Import Data Peserta (CSV)" sekali lagi untuk memilih file.');
@@ -1396,7 +1907,7 @@
         };
 
         window.resetData = () => {
-            if (!state.isAdminAuthenticated) {
+            if (!isAdmin()) {
                 window.requireAdmin(() => window.resetData(), 'Hapus Seluruh Database');
                 return;
             }
