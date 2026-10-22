@@ -61,6 +61,13 @@
 
         @keyframes pulse-soft { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.8; transform: scale(0.98); } }
         .animate-pulse-soft { animation: pulse-soft 2s infinite ease-in-out; }
+        @keyframes pb-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .pb-card { animation: pb-in .35s ease-out both; }
+        @keyframes pb-flash { 0% { background-color: #fef9c3; } 100% { background-color: #ffffff; } }
+        .pb-new { animation: pb-in .35s ease-out both, pb-flash 3s ease-out; }
+        .stat-click { cursor: pointer; transition: transform .15s ease, background-color .2s ease; }
+        .stat-click:hover { background: rgba(255,255,255,0.25); }
+        .stat-click:active { transform: scale(0.96); }
         img.qr-code { image-rendering: pixelated; mix-blend-mode: multiply; -webkit-touch-callout: default; }
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -130,13 +137,15 @@
                     <div class="text-3xl font-black text-white" id="statRegistered">0</div>
                     <div class="text-[10px] uppercase font-bold text-red-100 tracking-wider mt-1">Jemaat</div>
                 </div>
-                <div class="snap-center glass rounded-2xl p-4 flex-1 min-w-[100px] flex flex-col items-center justify-center relative overflow-hidden border-b-4 border-green-400">
+                <div role="button" tabindex="0" onclick="window.openPeopleBoard('attendance')" onkeydown="if(event.key==='Enter') window.openPeopleBoard('attendance')" title="Lihat nama-nama yang hadir" class="stat-click snap-center glass rounded-2xl p-4 flex-1 min-w-[100px] flex flex-col items-center justify-center relative overflow-hidden border-b-4 border-green-400">
                     <div class="text-3xl font-black text-green-300" id="statPresent">0</div>
                     <div class="text-[10px] uppercase font-bold text-red-100 tracking-wider mt-1">Hadir</div>
+                    <div class="text-[9px] font-bold text-white/70 mt-1">Lihat nama ›</div>
                 </div>
-                <div class="snap-center glass rounded-2xl p-4 flex-1 min-w-[100px] flex flex-col items-center justify-center relative overflow-hidden border-b-4 border-yellow-400">
+                <div role="button" tabindex="0" onclick="window.openPeopleBoard('gifts')" onkeydown="if(event.key==='Enter') window.openPeopleBoard('gifts')" title="Lihat nama-nama penerima hadiah" class="stat-click snap-center glass rounded-2xl p-4 flex-1 min-w-[100px] flex flex-col items-center justify-center relative overflow-hidden border-b-4 border-yellow-400">
                     <div class="text-3xl font-black text-yellow-300" id="statGifts">0</div>
                     <div class="text-[10px] uppercase font-bold text-red-100 tracking-wider mt-1">Hadiah</div>
+                    <div class="text-[9px] font-bold text-white/70 mt-1">Lihat nama ›</div>
                 </div>
             </div>
         </header>
@@ -430,6 +439,26 @@
                 <div class="flex gap-3 mt-5">
                     <button onclick="window.closeModal('restoreModal')" class="flex-1 py-3.5 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors">Batal</button>
                     <button id="rsBtn" onclick="window.doRestore()" class="flex-1 py-3.5 rounded-xl font-bold text-white bg-sky-700 hover:bg-sky-800 shadow-lg transition-colors">Pulihkan Sekarang</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAPAN NAMA HADIR / HADIAH -->
+    <div id="peopleModal" class="fixed inset-0 z-[9300] bg-slate-900/70 hidden backdrop-blur-sm transition-all duration-300 opacity-0 overflow-y-auto" onclick="if(event.target===this || event.target.dataset.backdrop) window.closePeopleBoard()">
+        <div data-backdrop="1" class="min-h-[100dvh] flex md:px-4 md:py-8">
+            <div class="bg-slate-50 w-full md:max-w-4xl md:rounded-[2rem] shadow-2xl transform scale-95 transition-transform duration-300 md:m-auto overflow-hidden flex flex-col min-h-[100dvh] md:min-h-0">
+                <div id="pbHeader"></div>
+                <div class="p-4 md:p-6 flex-1">
+                    <div id="pbChips" class="flex gap-2 overflow-x-auto no-scrollbar pb-2 mb-2"></div>
+                    <div class="flex gap-2 mb-4">
+                        <div class="relative flex-1">
+                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🔍</span>
+                            <input id="pbSearch" type="text" oninput="window.pbSetQuery(this.value)" placeholder="Cari nama, kelas, atau sektor..." class="w-full pl-10 pr-3 py-3 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:border-slate-400 shadow-sm">
+                        </div>
+                        <button id="pbSortBtn" onclick="window.pbToggleSort()" class="shrink-0 px-4 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 shadow-sm transition-colors" title="Ubah urutan">🕒 Terbaru</button>
+                    </div>
+                    <div id="pbList" class="grid grid-cols-1 md:grid-cols-2 gap-2.5 pb-4"></div>
                 </div>
             </div>
         </div>
@@ -1210,11 +1239,160 @@
             `;
         };
 
+        // ===================== PAPAN NAMA HADIR & HADIAH =====================
+        // Dibuka dari kartu "Hadir" / "Hadiah" di header, atau tombol di tab Data.
+        // Terbarui otomatis (live) setiap ada check-in / klaim hadiah baru.
+        const PB_THEME = {
+            attendance: { title: 'Jemaat Hadir', icon: '✅', badge: '✓', grad: 'from-emerald-600 via-emerald-700 to-teal-800', chip: 'bg-emerald-600', ring: 'ring-emerald-300', timeLabel: 'Check-in' },
+            gifts:      { title: 'Penerima Hadiah', icon: '🎁', badge: '🎁', grad: 'from-red-600 via-red-700 to-rose-900', chip: 'bg-red-600', ring: 'ring-red-300', timeLabel: 'Klaim' }
+        };
+        const PB_CLASS_ORDER = ['Pagi', 'Daud', 'Daniel', 'Paulus', 'Ester'];
+        const PB_COLORS = ['bg-rose-500', 'bg-amber-500', 'bg-emerald-500', 'bg-sky-500', 'bg-indigo-500', 'bg-fuchsia-500', 'bg-teal-500', 'bg-orange-500', 'bg-violet-500', 'bg-cyan-600'];
+        state.board = { open: false, mode: 'attendance', q: '', cls: 'Semua', sort: 'new', seen: {} };
+
+        const pbInitials = (name) => {
+            const w = String(name || '?').trim().split(/\s+/).filter(Boolean);
+            return ((w[0] || '?')[0] + (w.length > 1 ? w[w.length - 1][0] : '')).toUpperCase();
+        };
+        const pbColor = (name) => {
+            let h = 0; const s = String(name || '');
+            for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+            return PB_COLORS[Math.abs(h) % PB_COLORS.length];
+        };
+        const pbClassOf = (it) => (it.classGrade && it.classGrade !== '-') ? it.classGrade : 'Umum';
+        const pbItems = (mode) => (mode === 'gifts' ? state.gifts : state.attendance).map((it, i) => Object.assign({}, it, { _no: i + 1 }));
+
+        // Kartu satu orang (dipakai di papan & di tab Data)
+        window.personCardHTML = (it, no, mode, isNew) => {
+            const th = PB_THEME[mode];
+            const time = getTimeStr(it.timestamp);
+            return `
+            <div class="pb-card bg-white rounded-2xl p-3 flex items-center gap-3 border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all ${isNew ? 'pb-new ring-2 ' + th.ring : ''}">
+                <div class="relative shrink-0">
+                    <div class="w-11 h-11 rounded-full ${pbColor(it.name)} text-white font-black flex items-center justify-center text-sm shadow-inner">${escHTML(pbInitials(it.name))}</div>
+                    <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white border border-slate-100 shadow flex items-center justify-center text-[9px] ${mode === 'attendance' ? 'text-emerald-600 font-black' : ''}">${th.badge}</div>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="font-bold text-slate-800 text-sm leading-tight truncate">${escHTML(it.name)}</div>
+                    <div class="flex flex-wrap gap-1 mt-1">
+                        ${it.category ? `<span class="text-[9px] bg-amber-50 text-amber-700 border border-amber-100 px-1.5 py-0.5 rounded-md font-bold">${escHTML(it.category)}</span>` : ''}
+                        <span class="text-[9px] bg-indigo-50 text-indigo-700 border border-indigo-100 px-1.5 py-0.5 rounded-md font-bold">${escHTML(it.classGrade || '-')}</span>
+                        <span class="text-[9px] bg-sky-50 text-sky-700 border border-sky-100 px-1.5 py-0.5 rounded-md font-bold">${escHTML(it.sector || '-')}</span>
+                    </div>
+                </div>
+                <div class="text-right shrink-0">
+                    <div class="text-xs font-black text-slate-700 font-mono">${time ? escHTML(time) : '—'}</div>
+                    <div class="text-[9px] text-slate-400 font-bold mt-0.5">#${no}</div>
+                </div>
+            </div>`;
+        };
+
+        const pbRenderHeader = () => {
+            const { mode } = state.board; const th = PB_THEME[mode];
+            const items = pbItems(mode);
+            const total = items.length;
+            const base = mode === 'gifts' ? state.attendance.length : state.participants.length;
+            const pct = base ? Math.min(100, Math.round(total / base * 100)) : 0;
+            const last = items[items.length - 1];
+            document.getElementById('pbHeader').innerHTML = `
+                <div class="relative bg-gradient-to-br ${th.grad} text-white px-5 pt-5 pb-6 md:px-8 md:pt-7 overflow-hidden">
+                    <div class="absolute -top-16 -right-10 w-56 h-56 bg-white/10 rounded-full"></div>
+                    <div class="absolute -bottom-20 -left-10 w-48 h-48 bg-black/10 rounded-full"></div>
+                    <div class="absolute top-4 right-24 text-2xl opacity-30 select-none">❄️</div>
+                    <div class="absolute bottom-6 right-10 text-4xl opacity-20 select-none">✨</div>
+                    <div class="relative z-10 flex justify-between items-start">
+                        <div class="text-[10px] font-bold tracking-widest uppercase text-white/80">Natal 2026 · GKPS Tangerang</div>
+                        <button onclick="window.closePeopleBoard()" class="w-9 h-9 -mt-1 -mr-1 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white font-bold transition-colors" aria-label="Tutup">✕</button>
+                    </div>
+                    <div class="relative z-10 flex items-end gap-4 mt-2">
+                        <div class="text-5xl md:text-6xl drop-shadow">${th.icon}</div>
+                        <div>
+                            <div class="text-sm font-bold text-white/90">${th.title}</div>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-6xl md:text-7xl font-black tracking-tight leading-none drop-shadow-sm">${total}</span>
+                                <span class="text-sm font-bold text-white/80">orang</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative z-10 mt-4">
+                        <div class="flex justify-between text-[11px] font-bold text-white/85 mb-1.5">
+                            <span>${mode === 'gifts' ? 'dari ' + base + ' jemaat hadir' : 'dari ' + base + ' jemaat terdaftar'}</span>
+                            <span>${pct}%</span>
+                        </div>
+                        <div class="h-2.5 bg-black/20 rounded-full overflow-hidden"><div class="h-full bg-white rounded-full transition-all duration-700" style="width:${pct}%"></div></div>
+                    </div>
+                    ${last ? `
+                    <div class="relative z-10 mt-4 inline-flex items-center gap-2 bg-white/15 backdrop-blur px-3 py-1.5 rounded-full text-[11px] font-bold max-w-full">
+                        <span class="relative flex h-2 w-2 shrink-0"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span></span>
+                        <span class="truncate">Terbaru: ${escHTML(last.name)}${getTimeStr(last.timestamp) ? ' · ' + escHTML(getTimeStr(last.timestamp)) : ''}</span>
+                    </div>` : ''}
+                </div>`;
+        };
+
+        const pbRenderChips = () => {
+            const { mode, cls } = state.board; const th = PB_THEME[mode];
+            const items = pbItems(mode);
+            const counts = {};
+            items.forEach(it => { const c = pbClassOf(it); counts[c] = (counts[c] || 0) + 1; });
+            const keys = Object.keys(counts).sort((a, b) => {
+                const ia = PB_CLASS_ORDER.indexOf(a), ib = PB_CLASS_ORDER.indexOf(b);
+                return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || a.localeCompare(b);
+            });
+            const chip = (key, label, n) => `
+                <button onclick="window.pbSetClass('${escHTML(key)}')" class="shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${cls === key ? th.chip + ' text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'}">
+                    ${escHTML(label)} <span class="text-[10px] px-1.5 py-0.5 rounded-md ${cls === key ? 'bg-white/25' : 'bg-slate-100 text-slate-500'}">${n}</span>
+                </button>`;
+            document.getElementById('pbChips').innerHTML = chip('Semua', 'Semua', items.length) + keys.map(k => chip(k, k === 'Umum' ? 'Umum' : 'Kelas ' + k, counts[k])).join('');
+            document.getElementById('pbSortBtn').innerHTML = state.board.sort === 'new' ? '🕒 Terbaru' : '🔤 A–Z';
+        };
+
+        const pbRenderList = () => {
+            const { mode, q, cls, sort, seen } = state.board;
+            let items = pbItems(mode);
+            if (cls !== 'Semua') items = items.filter(it => pbClassOf(it) === cls);
+            if (q) {
+                const qq = q.toLowerCase();
+                items = items.filter(it => [it.name, it.classGrade, it.sector, it.category].some(v => String(v || '').toLowerCase().includes(qq)));
+            }
+            items = sort === 'new' ? items.reverse() : items.sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'id'));
+            const el = document.getElementById('pbList');
+            if (!items.length) {
+                el.innerHTML = `<div class="md:col-span-2 text-center py-14 bg-white rounded-2xl border-2 border-dashed border-slate-200">
+                    <div class="text-5xl mb-3 opacity-60">${q || cls !== 'Semua' ? '🔍' : (mode === 'gifts' ? '🎁' : '🎄')}</div>
+                    <div class="text-sm font-bold text-slate-500">${q || cls !== 'Semua' ? 'Tidak ada nama yang cocok' : (mode === 'gifts' ? 'Belum ada yang mengambil hadiah' : 'Belum ada jemaat yang check-in')}</div>
+                </div>`;
+                return;
+            }
+            el.innerHTML = items.map(it => window.personCardHTML(it, it._no, mode, seen[mode] != null && it._no > seen[mode])).join('');
+        };
+
+        window.refreshPeopleBoard = () => {
+            if (!state.board.open) return;
+            pbRenderHeader(); pbRenderChips(); pbRenderList();
+        };
+
+        window.openPeopleBoard = (mode) => {
+            state.board.mode = mode === 'gifts' ? 'gifts' : 'attendance';
+            state.board.q = ''; state.board.cls = 'Semua';
+            state.board.seen[state.board.mode] = pbItems(state.board.mode).length; // yang baru masuk setelah ini disorot
+            state.board.open = true;
+            document.getElementById('pbSearch').value = '';
+            window.refreshPeopleBoard();
+            openModalEl('peopleModal');
+        };
+        window.closePeopleBoard = () => { state.board.open = false; window.closeModal('peopleModal'); };
+        window.pbSetQuery = (v) => { state.board.q = v.trim(); pbRenderList(); };
+        window.pbSetClass = (c) => { state.board.cls = c; pbRenderChips(); pbRenderList(); };
+        window.pbToggleSort = () => { state.board.sort = state.board.sort === 'new' ? 'az' : 'new'; pbRenderChips(); pbRenderList(); };
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && state.board.open) window.closePeopleBoard(); });
+        // ========================================================================
+
         // --- LISTENERS MENGGUNAKAN FORMAT COMPAT ---
         db.ref('participants').on('value', s => {
             state.participants = s.val() ? Object.values(s.val()) : [];
             updateStats();
             if (state.tab === 'register') window.renderParticipantListOnly();
+            window.refreshPeopleBoard();
             document.getElementById('loading').style.display = 'none';
         });
         
@@ -1222,6 +1400,7 @@
             state.attendance = s.val() ? Object.values(s.val()) : [];
             updateStats();
             if (state.tab === 'data' && state.dataViewMode === 'attendance') window.render();
+            window.refreshPeopleBoard();
             document.getElementById('loading').style.display = 'none';
         });
 
@@ -1229,6 +1408,7 @@
             state.gifts = s.val() ? Object.values(s.val()) : [];
             updateStats();
             if (state.tab === 'data' && state.dataViewMode === 'gifts') window.render();
+            window.refreshPeopleBoard();
         });
 
         db.ref('drawWinners').on('value', s => {
@@ -1995,12 +2175,16 @@
 
                     <div class="flex justify-between items-end px-2 mb-3 mt-4 max-w-5xl mx-auto w-full">
                         <div><h3 class="font-bold text-slate-800 text-base">${headerText}</h3></div>
-                        <span class="text-[10px] font-bold bg-slate-200 text-slate-700 px-3 py-1 rounded-full shadow-inner">${dataToShow.length} Data</span>
+                        <div class="flex items-center gap-2">
+                            ${!isDrawView ? `<button onclick="window.openPeopleBoard('${isGiftView ? 'gifts' : 'attendance'}')" class="text-[10px] font-bold ${isGiftView ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-700'} text-white px-3 py-1.5 rounded-full shadow-md transition-colors">✨ Tampilan Penuh</button>` : ''}
+                            <span class="text-[10px] font-bold bg-slate-200 text-slate-700 px-3 py-1 rounded-full shadow-inner">${dataToShow.length} Data</span>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pb-8 max-w-5xl mx-auto w-full">
                         ${dataToShow.length === 0 ? `<div class="text-center py-12 bg-white rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 md:col-span-full"><div class="text-4xl mb-3 opacity-50">📭</div><div class="text-sm font-medium">Belum ada data terekam</div></div>` : ''}
-                        ${dataToShow.slice().reverse().map(item => `
+                        ${!isDrawView ? dataToShow.map((item, i) => [item, i + 1]).reverse().map(([item, no]) => window.personCardHTML(item, no, isGiftView ? 'gifts' : 'attendance', false)).join('') : ''}
+                        ${!isDrawView ? '' : dataToShow.slice().reverse().map(item => `
                             <div class="bg-white p-4 rounded-2xl shadow-sm flex items-center justify-between border border-slate-100 hover:shadow-md transition-all">
                                 <div class="min-w-0 pr-2">
                                     <div class="font-bold text-slate-800 text-sm mb-1 truncate">${item.name}</div>
