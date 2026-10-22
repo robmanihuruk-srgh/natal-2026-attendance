@@ -163,6 +163,9 @@
             <button onclick="window.setTab('users')" id="tab-users" class="hidden snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-md">
                 <span class="text-lg">👥</span><span>Pengguna</span>
             </button>
+            <button onclick="window.setTab('backup')" id="tab-backup" class="hidden snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-md">
+                <span class="text-lg">🛡️</span><span>Backup</span>
+            </button>
         </nav>
 
         <main class="flex-1 px-5 pt-2 pb-24 overflow-y-auto">
@@ -409,6 +412,30 @@
         </div>
     </div>
 
+    <div id="restoreModal" class="fixed inset-0 z-[9400] bg-slate-900/60 hidden backdrop-blur-sm transition-all duration-300 opacity-0 overflow-y-auto">
+        <div class="min-h-[100dvh] flex px-4 py-12">
+            <div class="bg-white w-full max-w-md rounded-[2rem] p-6 shadow-2xl transform scale-95 transition-transform duration-300 m-auto">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center text-xl">♻️</div>
+                    <h3 class="text-xl font-bold text-slate-800">Pulihkan Backup</h3>
+                </div>
+                <div id="rsInfo" class="bg-slate-50 border border-slate-100 rounded-xl p-3 mb-3"></div>
+                <p class="text-xs text-slate-500 mb-3 font-medium">Data yang dicentang akan <b>diganti</b> dengan isi backup. Kondisi saat ini otomatis di-backup dulu sebagai pengaman.</p>
+                <div id="rsNodes" class="space-y-2"></div>
+                <div class="mt-4">
+                    <label for="rsConfirm" class="block text-xs font-bold text-slate-500 mb-1 ml-1">Ketik <b>PULIHKAN</b> untuk konfirmasi</label>
+                    <input id="rsConfirm" type="text" autocomplete="off" placeholder="PULIHKAN" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:border-red-400 font-mono uppercase">
+                </div>
+                <div id="rsError" class="hidden text-xs font-bold text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2.5 mt-3"></div>
+                <div class="flex gap-3 mt-5">
+                    <button onclick="window.closeModal('restoreModal')" class="flex-1 py-3.5 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors">Batal</button>
+                    <button id="rsBtn" onclick="window.doRestore()" class="flex-1 py-3.5 rounded-xl font-bold text-white bg-sky-700 hover:bg-sky-800 shadow-lg transition-colors">Pulihkan Sekarang</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="backupFileInput" accept=".json,application/json" class="hidden" onchange="window.loadBackupFile(this)">
     <input type="file" id="importInput" accept=".csv" class="hidden" onchange="window.importData(this)">
 
     <script>
@@ -450,8 +477,8 @@
             { key: 'export', label: 'Download / Export Data', icon: '📥' }
         ];
         const ALL_PERMS = () => PERMS.reduce((o, p) => { o[p.key] = true; return o; }, {});
-        const TAB_PERMS = { scan: ['scan', 'manual'], gift: ['gift'], draw: ['draw'], users: ['__admin'] };
-        const TAB_LABELS = { scan: 'Absen', gift: 'Hadiah', draw: 'Undian Door Prize', users: 'Pengguna' };
+        const TAB_PERMS = { scan: ['scan', 'manual'], gift: ['gift'], draw: ['draw'], users: ['__admin'], backup: ['__admin'] };
+        const TAB_LABELS = { scan: 'Absen', gift: 'Hadiah', draw: 'Undian Door Prize', users: 'Pengguna', backup: 'Backup' };
 
         let pendingAdminAction = null;
         let profileRef = null, usersRef = null, secondaryApp = null;
@@ -521,8 +548,11 @@
             state.adminEmail = state.user ? state.user.email : '';
             updateAdminChip();
 
-            const navUsers = document.getElementById('tab-users');
-            if (navUsers) navUsers.classList.toggle('hidden', !isAdmin());
+            ['tab-users', 'tab-backup'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.toggle('hidden', !isAdmin());
+            });
+            if (isAdmin()) startBackupWatch(); else stopBackupWatch();
 
             if (isAdmin() && !usersRef) {
                 usersRef = db.ref('users');
@@ -670,7 +700,8 @@
                 <div class="text-xs font-bold text-slate-500 mb-2 ml-1">Hak akses Anda</div>
                 <div class="flex flex-wrap gap-1.5 mb-6">${permChipsHTML(u)}</div>
                 <div class="space-y-2">
-                    ${isAdmin() ? `<button onclick="window.closeModal('accountModal'); window.setTab('users')" class="w-full py-3 rounded-xl font-bold text-white bg-slate-800 hover:bg-slate-900 transition-colors">👥 Kelola Pengguna</button>` : ''}
+                    ${isAdmin() ? `<button onclick="window.closeModal('accountModal'); window.setTab('users')" class="w-full py-3 rounded-xl font-bold text-white bg-slate-800 hover:bg-slate-900 transition-colors">👥 Kelola Pengguna</button>
+                    <button onclick="window.closeModal('accountModal'); window.setTab('backup')" class="w-full py-3 rounded-xl font-bold text-sky-700 bg-sky-50 border border-sky-200 hover:bg-sky-100 transition-colors">🛡️ Backup & Pemulihan</button>` : ''}
                     <button onclick="window.closeModal('accountModal'); window.openOwnPassword()" class="w-full py-3 rounded-xl font-bold text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-colors">🔑 Ganti Password Saya</button>
                     <button onclick="window.adminLogout()" class="w-full py-3 rounded-xl font-bold text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors">🚪 Keluar</button>
                     <button onclick="window.closeModal('accountModal')" class="w-full py-3 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors">Tutup</button>
@@ -862,17 +893,255 @@
             if (targets.length === 0) { showErr('rcError', 'Pilih minimal satu data yang akan di-reset.'); return; }
             if ($val('rcConfirm').trim().toUpperCase() !== 'RESET') { showErr('rcError', 'Ketik RESET untuk konfirmasi.'); return; }
             const btn = document.getElementById('rcBtn');
-            btn.disabled = true; btn.innerText = 'Memproses...';
+            btn.disabled = true; btn.innerText = 'Membuat backup...';
             try {
+                if (!(await safetyBackup('Otomatis: sebelum Reset Data Check-in (' + targets.map(t => t[1]).join(', ') + ')'))) return;
+                btn.innerText = 'Memproses...';
                 await Promise.all(targets.map(([path]) => db.ref(path).set(null)));
                 window.closeModal('resetCheckinModal');
-                alert(`✅ Reset selesai: ${targets.map(t => t[1]).join(', ')}.\n\nData pendaftaran (${state.participants.length} peserta) tetap tersimpan. Peserta bisa check-in ulang memakai tiket yang sama.`);
+                alert(`✅ Reset selesai: ${targets.map(t => t[1]).join(', ')}.\n\nData pendaftaran (${state.participants.length} peserta) tetap tersimpan. Peserta bisa check-in ulang memakai tiket yang sama.\n\n🛡️ Data sebelum reset tersimpan di menu Backup.`);
             } catch (e) {
                 showErr('rcError', authErrMsg(e));
             } finally {
                 btn.disabled = false; btn.innerText = 'Reset Sekarang';
             }
         };
+
+        // ===================== BACKUP & PEMULIHAN (khusus admin) =====================
+        //   /backupIndex/{id} -> ringkasan (tanggal, alasan, jumlah data)  — ringan, untuk daftar
+        //   /backups/{id}     -> salinan lengkap participants / attendance / gifts / drawWinners
+        // Jenis: manual (dibuat admin), auto (berkala tiap 1 jam bila ada perubahan),
+        //        safety (otomatis sebelum reset / hapus / pemulihan — tidak pernah dihapus otomatis)
+        const BACKUP_NODES = [
+            ['participants', 'Peserta (pendaftaran)', '📝'],
+            ['attendance', 'Absensi', '📋'],
+            ['gifts', 'Hadiah', '🎁'],
+            ['drawWinners', 'Undian', '🎰']
+        ];
+        const BACKUP_FORMAT = 'natal2026-backup';
+        const BACKUP_INTERVAL_MS = 60 * 60 * 1000;   // backup berkala: tiap 1 jam
+        const BACKUP_MAX_AUTO = 48;                  // simpan maks. 48 backup berkala terbaru
+        state.backups = []; state.backupsLoaded = false; state.restoreSource = null;
+        let backupIndexRef = null, autoBackupTimer = null, backupBusy = false;
+
+        const countOf = (v) => (v && typeof v === 'object') ? Object.keys(v).length : 0;
+        const fingerprintOf = (data) => {
+            const str = JSON.stringify(data);
+            let h = 0;
+            for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
+            return (h >>> 0).toString(16) + '-' + str.length;
+        };
+        const BACKUP_TYPE_LABEL = { manual: '💾 Manual', auto: '⏱️ Otomatis', safety: '🛡️ Pengaman' };
+
+        const snapshotData = async () => {
+            const out = {};
+            for (const [node] of BACKUP_NODES) {
+                const s = await db.ref(node).once('value');
+                out[node] = s.val() || null;
+            }
+            return out;
+        };
+
+        window.createBackup = async (reason, type = 'manual', skipIfUnchanged = false) => {
+            if (!isAdmin()) throw new Error('Hanya admin yang bisa membuat backup.');
+            const data = await snapshotData();
+            const fp = fingerprintOf(data);
+            if (skipIfUnchanged && state.backups[0] && state.backups[0].fingerprint === fp) return null;
+            const id = 'b' + Date.now() + Math.random().toString(36).slice(2, 5);
+            const counts = {};
+            const stored = {};
+            BACKUP_NODES.forEach(([n]) => { counts[n] = countOf(data[n]); if (data[n]) stored[n] = data[n]; });
+            if (!Object.keys(stored).length) stored._kosong = true;
+            const meta = {
+                createdAt: Date.now(), createdAtText: fmtDate(), by: state.user.email,
+                reason: String(reason || 'Backup').slice(0, 120), type, counts, fingerprint: fp,
+                size: JSON.stringify(stored).length
+            };
+            const upd = {};
+            upd['backups/' + id] = stored;
+            upd['backupIndex/' + id] = meta;
+            await db.ref().update(upd);
+            pruneAutoBackups().catch(e => console.warn('Gagal merapikan backup lama', e));
+            return Object.assign({ id }, meta);
+        };
+
+        // Hapus backup berkala paling lama (backup manual & pengaman tidak disentuh)
+        const pruneAutoBackups = async () => {
+            const s = await db.ref('backupIndex').once('value');
+            const v = s.val() || {};
+            const autos = Object.keys(v).filter(k => v[k].type === 'auto').sort((a, b) => v[b].createdAt - v[a].createdAt);
+            const old = autos.slice(BACKUP_MAX_AUTO);
+            if (!old.length) return;
+            const upd = {};
+            old.forEach(k => { upd['backups/' + k] = null; upd['backupIndex/' + k] = null; });
+            await db.ref().update(upd);
+        };
+
+        // Backup pengaman sebelum tindakan berbahaya. Return false = batalkan tindakan.
+        const safetyBackup = async (reason) => {
+            try {
+                await window.createBackup(reason, 'safety');
+                return true;
+            } catch (e) {
+                console.error(e);
+                return confirm('⚠️ Backup otomatis GAGAL dibuat:\n' + authErrMsg(e) + '\n\nTetap lanjutkan TANPA backup? (Tidak disarankan)');
+            }
+        };
+
+        const runAutoBackup = async () => {
+            if (!isAdmin() || !state.backupsLoaded || backupBusy) return;
+            const last = state.backups[0];
+            if (last && Date.now() - last.createdAt < BACKUP_INTERVAL_MS) return;
+            backupBusy = true;
+            try { await window.createBackup('Backup berkala otomatis', 'auto', true); }
+            catch (e) { console.warn('Backup otomatis gagal', e); }
+            finally { backupBusy = false; }
+        };
+
+        const startBackupWatch = () => {
+            if (backupIndexRef) return;
+            backupIndexRef = db.ref('backupIndex');
+            backupIndexRef.on('value', s => {
+                const v = s.val() || {};
+                state.backups = Object.keys(v).map(id => Object.assign({ counts: {} }, v[id], { id })).sort((a, b) => b.createdAt - a.createdAt);
+                state.backupsLoaded = true;
+                if (state.tab === 'backup') window.render();
+            }, err => console.error('Gagal memuat daftar backup', err));
+            autoBackupTimer = setInterval(runAutoBackup, 5 * 60 * 1000);
+            setTimeout(runAutoBackup, 20 * 1000);
+        };
+        const stopBackupWatch = () => {
+            if (backupIndexRef) { backupIndexRef.off(); backupIndexRef = null; }
+            if (autoBackupTimer) { clearInterval(autoBackupTimer); autoBackupTimer = null; }
+            state.backups = []; state.backupsLoaded = false;
+        };
+
+        window.backupNow = () => window.requireAdmin(async () => {
+            const reason = prompt('Catatan backup (opsional), contoh: "Sebelum acara dimulai":', '');
+            if (reason === null) return;
+            try {
+                const b = await window.createBackup(reason.trim() || 'Backup manual', 'manual');
+                alert(`✅ Backup tersimpan (${b.createdAtText}).\n\nPeserta: ${b.counts.participants} · Absensi: ${b.counts.attendance} · Hadiah: ${b.counts.gifts} · Undian: ${b.counts.drawWinners}`);
+            } catch (e) { alert(authErrMsg(e)); }
+        }, 'Backup Data');
+
+        const fileStamp = (ts) => {
+            const d = new Date(ts); const z = (n) => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}_${z(d.getHours())}${z(d.getMinutes())}`;
+        };
+        const downloadJSON = (obj, filename) => {
+            const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob); link.download = filename;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(link.href), 2000);
+        };
+
+        // Download backup tersimpan (id) atau data saat ini (tanpa id) sebagai file .json
+        window.downloadBackup = (id) => window.requireAdmin(async () => {
+            try {
+                let data, meta;
+                if (id) {
+                    meta = state.backups.find(b => b.id === id);
+                    const s = await db.ref('backups/' + id).once('value');
+                    data = s.val() || {};
+                } else {
+                    data = await snapshotData();
+                    meta = { createdAt: Date.now(), createdAtText: fmtDate(), by: state.user.email, reason: 'Download data saat ini', type: 'manual' };
+                }
+                const clean = {};
+                BACKUP_NODES.forEach(([n]) => { clean[n] = data[n] || null; });
+                const m = meta || { createdAt: Date.now() };
+                downloadJSON({ format: BACKUP_FORMAT, version: 1, exportedAt: new Date().toISOString(), meta: m, data: clean },
+                    `Backup_Natal2026_${fileStamp(m.createdAt || Date.now())}.json`);
+            } catch (e) { alert(authErrMsg(e)); }
+        }, 'Download Backup');
+
+        window.deleteBackup = (id) => window.requireAdmin(async () => {
+            const b = state.backups.find(x => x.id === id);
+            if (!b) return;
+            if (!confirm(`Hapus backup ${b.createdAtText || ''}?\n"${b.reason}"\n\nBackup yang dihapus tidak bisa dikembalikan.`)) return;
+            try {
+                const upd = {}; upd['backups/' + id] = null; upd['backupIndex/' + id] = null;
+                await db.ref().update(upd);
+            } catch (e) { alert(authErrMsg(e)); }
+        }, 'Hapus Backup');
+
+        // ---------- Pemulihan ----------
+        const openRestoreModal = (source) => {
+            state.restoreSource = source;
+            const m = source.meta || {};
+            document.getElementById('rsInfo').innerHTML = `
+                <div class="font-bold text-slate-800 text-sm">${escHTML(m.createdAtText || (m.createdAt ? new Date(m.createdAt).toLocaleString('id-ID') : '-'))}</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">${escHTML(m.reason || '')}${m.by ? ' · oleh ' + escHTML(m.by) : ''}${source.kind === 'file' ? ' · dari file ' + escHTML(source.fileName || '') : ''}</div>`;
+            document.getElementById('rsNodes').innerHTML = BACKUP_NODES.map(([n, label, icon]) => {
+                const inBackup = countOf(source.data[n]);
+                const now = n === 'participants' ? state.participants.length : n === 'attendance' ? state.attendance.length : n === 'gifts' ? state.gifts.length : state.drawWinners.length;
+                return `
+                <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer">
+                    <input id="rsNode-${n}" type="checkbox" checked class="w-4 h-4 accent-sky-600">
+                    <span class="text-sm font-bold text-slate-700 flex-1">${icon} ${label}</span>
+                    <span class="text-[10px] font-bold text-slate-500 text-right leading-tight">backup: <b class="text-sky-700">${inBackup}</b><br>sekarang: ${now}</span>
+                </label>`;
+            }).join('');
+            document.getElementById('rsConfirm').value = '';
+            showErr('rsError', '');
+            openModalEl('restoreModal');
+        };
+
+        window.restoreBackup = (id) => window.requireAdmin(async () => {
+            const meta = state.backups.find(b => b.id === id);
+            try {
+                const s = await db.ref('backups/' + id).once('value');
+                openRestoreModal({ kind: 'db', id, meta, data: s.val() || {} });
+            } catch (e) { alert(authErrMsg(e)); }
+        }, 'Pulihkan Backup');
+
+        window.pickBackupFile = () => window.requireAdmin(() => {
+            document.getElementById('backupFileInput').click();
+        }, 'Pulihkan dari File');
+
+        window.loadBackupFile = (input) => {
+            const f = input.files[0]; input.value = '';
+            if (!f || !isAdmin()) return;
+            const r = new FileReader();
+            r.onload = (e) => {
+                let obj;
+                try { obj = JSON.parse(e.target.result); } catch (err) { alert('❌ File bukan JSON yang valid.'); return; }
+                if (!obj || obj.format !== BACKUP_FORMAT || !obj.data || typeof obj.data !== 'object') {
+                    alert('❌ File ini bukan file backup aplikasi Natal 2026.\nGunakan file hasil tombol "Download" di menu Backup.');
+                    return;
+                }
+                const data = {};
+                BACKUP_NODES.forEach(([n]) => { const v = obj.data[n]; data[n] = (v && typeof v === 'object' && !Array.isArray(v)) ? v : null; });
+                openRestoreModal({ kind: 'file', fileName: f.name, meta: obj.meta || {}, data });
+            };
+            r.readAsText(f);
+        };
+
+        window.doRestore = async () => {
+            if (!isAdmin() || !state.restoreSource) return;
+            const src = state.restoreSource;
+            const picked = BACKUP_NODES.filter(([n]) => document.getElementById('rsNode-' + n).checked);
+            if (!picked.length) { showErr('rsError', 'Pilih minimal satu data yang akan dipulihkan.'); return; }
+            if ($val('rsConfirm').trim().toUpperCase() !== 'PULIHKAN') { showErr('rsError', 'Ketik PULIHKAN untuk konfirmasi.'); return; }
+            const btn = document.getElementById('rsBtn');
+            btn.disabled = true; btn.innerText = 'Membuat backup pengaman...';
+            try {
+                if (!(await safetyBackup('Otomatis: sebelum pemulihan data'))) return;
+                btn.innerText = 'Memulihkan...';
+                const upd = {};
+                picked.forEach(([n]) => { upd[n] = src.data[n] || null; });
+                await db.ref().update(upd);
+                window.closeModal('restoreModal');
+                alert(`✅ Pemulihan selesai: ${picked.map(p => p[1]).join(', ')}.\n\nKondisi sebelum pemulihan juga sudah di-backup (jenis "Pengaman"), jadi bisa dikembalikan bila perlu.`);
+            } catch (e) {
+                showErr('rsError', authErrMsg(e));
+            } finally {
+                btn.disabled = false; btn.innerText = 'Pulihkan Sekarang';
+            }
+        };
+        // ========================================================================
 
         // Sesi login tersimpan di browser: setelah refresh, petugas tidak perlu login ulang.
         auth.onAuthStateChanged((user) => {
@@ -1226,19 +1495,20 @@
             if((state.tab === 'scan' || state.tab === 'gift') && (t !== 'scan' && t !== 'gift')) window.stopScanner();
             state.tab = t;
             
-            const tabs = ['register','find','scan','gift','draw','data','users'];
+            const tabs = ['register','find','scan','gift','draw','data','users','backup'];
             tabs.forEach(x => {
                 const btn = document.getElementById(`tab-${x}`);
                 if(x === t) {
                     let bgCol = 'bg-red-600';
                     if (t === 'draw') bgCol = 'bg-purple-600'; 
                     if (t === 'users') bgCol = 'bg-slate-800';
+                    if (t === 'backup') bgCol = 'bg-sky-700';
                     
                     btn.className = `snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-lg ${bgCol} text-white -translate-y-1`;
                 } else {
                     btn.className = "snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-sm bg-white text-slate-400 hover:text-slate-600 hover:bg-slate-50";
                 }
-                if (x === 'users' && !isAdmin()) btn.classList.add('hidden');
+                if ((x === 'users' || x === 'backup') && !isAdmin()) btn.classList.add('hidden');
             });
             window.render();
             
@@ -1565,6 +1835,64 @@
                     </div>
                 `;
                 setTimeout(() => { window.renderDrawWinners(); }, 50);
+            } else if (state.tab === 'backup') {
+                if (!isAdmin()) {
+                    root.innerHTML = `<div class="text-center py-12 bg-white rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 max-w-3xl mx-auto w-full">🔒 Menu ini khusus admin.</div>`;
+                    return;
+                }
+                const list = state.backups;
+                const last = list[0];
+                const lastAuto = list.find(b => b.type === 'auto');
+                const countChips = (c) => BACKUP_NODES.map(([n, label, icon]) => `<span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded-md font-bold">${icon} ${(c && c[n]) || 0}</span>`).join('');
+                root.innerHTML = `
+                    <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 mb-4 max-w-5xl mx-auto w-full">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 bg-sky-100 rounded-2xl flex items-center justify-center text-2xl shadow-inner">🛡️</div>
+                            <div>
+                                <h3 class="font-bold text-xl text-slate-800 leading-tight">Backup & Pemulihan</h3>
+                                <p class="text-[11px] text-slate-500 font-medium">${last ? 'Backup terakhir: <b>' + escHTML(last.createdAtText || '') + '</b>' : (state.backupsLoaded ? 'Belum ada backup' : 'Memuat...')}</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                            <button onclick="window.backupNow()" class="py-3.5 rounded-xl text-xs font-bold text-white bg-sky-700 hover:bg-sky-800 shadow-lg transition-colors">💾 Backup Sekarang</button>
+                            <button onclick="window.downloadBackup()" class="py-3.5 rounded-xl text-xs font-bold text-sky-700 bg-sky-50 border border-sky-200 hover:bg-sky-100 transition-colors">📥 Download Data Saat Ini (.json)</button>
+                            <button onclick="window.pickBackupFile()" class="py-3.5 rounded-xl text-xs font-bold text-slate-600 bg-slate-50 border-2 border-dashed border-slate-200 hover:bg-slate-100 transition-colors">📂 Pulihkan dari File</button>
+                        </div>
+                        <div class="text-[10px] font-semibold text-sky-800 bg-sky-50 border border-sky-100 rounded-xl px-3 py-2.5 mt-4 leading-relaxed space-y-1">
+                            <div>⏱️ <b>Otomatis tiap 1 jam</b> selama ada admin yang membuka aplikasi, hanya bila data berubah${lastAuto ? ' (terakhir: ' + escHTML(lastAuto.createdAtText || '') + ')' : ''}. Disimpan ${BACKUP_MAX_AUTO} backup berkala terbaru.</div>
+                            <div>🛡️ <b>Otomatis sebelum</b> Reset Data Check-in, Hapus Seluruh Database, dan Pemulihan. Backup jenis ini tidak pernah dihapus otomatis.</div>
+                            <div>💡 Simpan juga file <b>.json</b> ke laptop / Google Drive secara berkala (mis. sebelum & sesudah acara). Backup di server ikut hilang jika proyek Firebase terhapus.</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-end px-2 mb-3 max-w-5xl mx-auto w-full">
+                        <h3 class="font-bold text-slate-800 text-base">Daftar Backup</h3>
+                        <span class="text-[10px] font-bold bg-slate-200 text-slate-700 px-3 py-1 rounded-full shadow-inner">${list.length} backup</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pb-8 max-w-5xl mx-auto w-full">
+                        ${list.length === 0 ? `<div class="text-center py-10 bg-white rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 text-sm md:col-span-full">${state.backupsLoaded ? 'Belum ada backup. Klik 💾 Backup Sekarang.' : 'Memuat daftar backup...'}</div>` : ''}
+                        ${list.map(b => {
+                            const idAttr = escHTML(b.id);
+                            const typeCls = b.type === 'safety' ? 'bg-amber-100 text-amber-700' : (b.type === 'auto' ? 'bg-slate-100 text-slate-600' : 'bg-sky-100 text-sky-700');
+                            return `
+                            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                                <div class="flex justify-between items-start gap-2 mb-1">
+                                    <div class="min-w-0">
+                                        <div class="font-bold text-slate-800 text-sm">${escHTML(b.createdAtText || new Date(b.createdAt).toLocaleString('id-ID'))}</div>
+                                        <div class="text-[11px] text-slate-500 truncate">${escHTML(b.reason || '')}</div>
+                                        <div class="text-[10px] text-slate-400 truncate">oleh ${escHTML(b.by || '-')}</div>
+                                    </div>
+                                    <span class="text-[9px] font-bold px-2 py-0.5 rounded-md shrink-0 ${typeCls}">${BACKUP_TYPE_LABEL[b.type] || b.type}</span>
+                                </div>
+                                <div class="flex flex-wrap gap-1 my-2">${countChips(b.counts)}</div>
+                                <div class="grid grid-cols-3 gap-1.5">
+                                    <button onclick="window.restoreBackup('${idAttr}')" class="py-2 rounded-lg text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-100 hover:bg-sky-100 transition-colors">♻️ Pulihkan</button>
+                                    <button onclick="window.downloadBackup('${idAttr}')" class="py-2 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">⬇️ Download</button>
+                                    <button onclick="window.deleteBackup('${idAttr}')" class="py-2 rounded-lg text-[10px] font-bold bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-colors">🗑️ Hapus</button>
+                                </div>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                `;
             } else if (state.tab === 'users') {
                 if (!isAdmin()) {
                     root.innerHTML = `<div class="text-center py-12 bg-white rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 max-w-3xl mx-auto w-full">🔒 Menu ini khusus admin.</div>`;
@@ -1691,6 +2019,9 @@
                         `).join('')}
                         
                         <div class="mt-8 text-center pb-8 md:col-span-full w-full flex flex-wrap justify-center gap-2">
+                            <button onclick="window.setTab('backup')" class="text-[10px] text-sky-700 font-bold border border-sky-200 bg-sky-50 px-4 py-2 rounded-full hover:bg-sky-100 transition-colors">
+                                🛡️ Backup & Pemulihan
+                            </button>
                             <button onclick="window.openResetCheckin()" class="text-[10px] text-amber-600 font-bold border border-amber-200 bg-amber-50 px-4 py-2 rounded-full hover:bg-amber-100 transition-colors">
                                 🔄 Reset Data Check-in (peserta tetap)
                             </button>
@@ -1906,7 +2237,7 @@
             document.getElementById('importInput').click();
         };
 
-        window.resetData = () => {
+        window.resetData = async () => {
             if (!isAdmin()) {
                 window.requireAdmin(() => window.resetData(), 'Hapus Seluruh Database');
                 return;
@@ -1915,14 +2246,15 @@
             const typed = prompt(warningText);
             if (typed === null) return;
             if (typed.trim().toUpperCase() !== 'HAPUS') { alert("Dibatalkan. Teks konfirmasi tidak sesuai."); return; }
-            if (!confirm("Apakah Anda YAKIN ingin menghapus SEMUA data? Data yang terhapus tidak dapat dikembalikan.")) return;
+            if (!confirm("Apakah Anda YAKIN ingin menghapus SEMUA data?\n\nSistem akan membuat backup otomatis dulu, jadi data masih bisa dipulihkan dari menu Backup.")) return;
+            if (!(await safetyBackup('Otomatis: sebelum Hapus Seluruh Database'))) return;
 
             Promise.all([
                 db.ref('participants').set(null),
                 db.ref('attendance').set(null),
                 db.ref('gifts').set(null),
                 db.ref('drawWinners').set(null)
-            ]).then(() => alert("Database berhasil di-reset ke kondisi kosong."))
+            ]).then(() => alert("Database berhasil di-reset ke kondisi kosong.\n\n🛡️ Data sebelum dihapus tersimpan di menu Backup."))
               .catch(handleWriteError);
         };
 
