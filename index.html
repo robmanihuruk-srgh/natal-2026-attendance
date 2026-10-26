@@ -421,6 +421,31 @@
         </div>
     </div>
 
+    <div id="resetDrawModal" class="fixed inset-0 z-[9400] bg-slate-900/60 hidden backdrop-blur-sm transition-all duration-300 opacity-0 overflow-y-auto">
+        <div class="min-h-[100dvh] flex px-4 py-12">
+            <div class="bg-white w-full max-w-md rounded-[2rem] p-6 shadow-2xl transform scale-95 transition-transform duration-300 m-auto">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-xl">🔄</div>
+                    <h3 class="text-xl font-bold text-slate-800">Reset Undian Door Prize</h3>
+                </div>
+                <p class="text-xs text-slate-500 mb-4 font-medium">Daftar pemenang dikosongkan dan undian kembali ke <b>posisi awal</b>. Peserta yang sudah menang bisa ikut diundi lagi. Data peserta, absensi, hadiah &amp; pengaturan kelas <b>tidak berubah</b>.</p>
+                <label for="rdScope" class="block text-xs font-bold text-slate-500 mb-1 ml-1">Pemenang yang di-reset</label>
+                <select id="rdScope" onchange="window.updateResetDrawInfo()" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:outline-none focus:border-purple-400"></select>
+                <div id="rdInfo" class="mt-3 text-xs font-bold text-purple-700 bg-purple-50 border border-purple-100 rounded-xl px-3 py-2.5"></div>
+                <div class="mt-4">
+                    <label for="rdConfirm" class="block text-xs font-bold text-slate-500 mb-1 ml-1">Ketik <b>RESET</b> untuk konfirmasi</label>
+                    <input id="rdConfirm" type="text" autocomplete="off" placeholder="RESET" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:border-red-400 font-mono uppercase">
+                </div>
+                <p class="text-[10px] text-slate-400 mt-2 font-medium">🛡️ Backup pengaman dibuat otomatis sebelum reset, jadi daftar pemenang bisa dipulihkan dari menu Backup bila diperlukan.</p>
+                <div id="rdError" class="hidden text-xs font-bold text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2.5 mt-3"></div>
+                <div class="flex gap-3 mt-5">
+                    <button onclick="window.closeModal('resetDrawModal')" class="flex-1 py-3.5 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors">Batal</button>
+                    <button id="rdBtn" onclick="window.doResetDraw()" class="flex-1 py-3.5 rounded-xl font-bold text-white bg-purple-600 hover:bg-purple-700 shadow-lg transition-colors">Reset Undian</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="restoreModal" class="fixed inset-0 z-[9400] bg-slate-900/60 hidden backdrop-blur-sm transition-all duration-300 opacity-0 overflow-y-auto">
         <div class="min-h-[100dvh] flex px-4 py-12">
             <div class="bg-white w-full max-w-md rounded-[2rem] p-6 shadow-2xl transform scale-95 transition-transform duration-300 m-auto">
@@ -936,6 +961,82 @@
             }
         };
 
+        // ---------- Reset Undian Door Prize (khusus admin) ----------
+        const drawClassLabel = (c) => (c === '-' || !c) ? 'Umum / Tidak Ada' : 'Kelas ' + c;
+        state.drawSpinning = false; state.drawShownPid = null;
+
+        // Kembalikan tampilan undian ke posisi awal (kotak pemenang disembunyikan)
+        window.resetDrawBoxUI = () => {
+            state.drawShownPid = null;
+            const box = document.getElementById('drawBox');
+            if (box) {
+                box.classList.add('hidden');
+                box.classList.remove('bg-gradient-to-br', 'from-purple-600', 'to-indigo-700', 'border-purple-400', 'animate-pulse-soft');
+                box.classList.add('bg-slate-800', 'border-slate-700');
+            }
+            const nm = document.getElementById('drawName');
+            if (nm) { nm.innerText = '-'; nm.classList.remove('text-yellow-300'); nm.classList.add('text-white'); }
+            const dt = document.getElementById('drawDetails');
+            if (dt) dt.innerText = '-';
+            const btn = document.getElementById('btnDraw');
+            if (btn && !state.drawSpinning) btn.innerHTML = '🎲 Acak Pemenang Sekarang';
+        };
+
+        window.openResetDraw = () => {
+            window.requireAdmin(() => {
+                if (state.drawSpinning) { alert('⏳ Tunggu sampai pengacakan selesai.'); return; }
+                if (state.drawWinners.length === 0) { alert('Belum ada pemenang undian. Undian sudah di posisi awal.'); return; }
+                const byClass = {};
+                state.drawWinners.forEach(w => { const c = w.classGrade || '-'; byClass[c] = (byClass[c] || 0) + 1; });
+                document.getElementById('rdScope').innerHTML =
+                    `<option value="__all__">Semua pemenang (${state.drawWinners.length})</option>` +
+                    Object.keys(byClass).sort().map(c => `<option value="${escHTML(c)}">Hanya ${escHTML(drawClassLabel(c))} (${byClass[c]})</option>`).join('');
+                document.getElementById('rdConfirm').value = '';
+                showErr('rdError', '');
+                window.updateResetDrawInfo();
+                openModalEl('resetDrawModal');
+            }, 'Reset Undian');
+        };
+
+        window.updateResetDrawInfo = () => {
+            const scope = $val('rdScope');
+            const list = scope === '__all__' ? state.drawWinners : state.drawWinners.filter(w => (w.classGrade || '-') === scope);
+            const names = list.slice(0, 5).map(w => escHTML(w.name)).join(', ') + (list.length > 5 ? `, +${list.length - 5} lainnya` : '');
+            document.getElementById('rdInfo').innerHTML = `🎰 ${list.length} pemenang akan dihapus: <span class="font-semibold text-purple-600">${names}</span>`;
+        };
+
+        window.doResetDraw = async () => {
+            if (!isAdmin()) return;
+            if (state.drawSpinning) { showErr('rdError', 'Tunggu sampai pengacakan selesai.'); return; }
+            if ($val('rdConfirm').trim().toUpperCase() !== 'RESET') { showErr('rdError', 'Ketik RESET untuk konfirmasi.'); return; }
+            const scope = $val('rdScope');
+            const label = scope === '__all__' ? 'semua kelas' : drawClassLabel(scope);
+            const btn = document.getElementById('rdBtn');
+            btn.disabled = true; btn.innerText = 'Membuat backup...';
+            try {
+                if (!(await safetyBackup('Otomatis: sebelum Reset Undian (' + label + ')'))) return;
+                btn.innerText = 'Memproses...';
+                let removed = 0;
+                if (scope === '__all__') {
+                    removed = state.drawWinners.length;
+                    await db.ref('drawWinners').set(null);
+                } else {
+                    const snap = await db.ref('drawWinners').once('value');
+                    const upd = {};
+                    Object.entries(snap.val() || {}).forEach(([k, w]) => { if (((w && w.classGrade) || '-') === scope) upd[k] = null; });
+                    removed = Object.keys(upd).length;
+                    if (removed) await db.ref('drawWinners').update(upd);
+                }
+                window.closeModal('resetDrawModal');
+                window.resetDrawBoxUI();
+                alert(`✅ Undian ${label} berhasil di-reset (${removed} pemenang dihapus).\n\nUndian kembali ke posisi awal dan peserta bisa diundi lagi.\n\n🛡️ Daftar pemenang sebelum reset tersimpan di menu Backup.`);
+            } catch (e) {
+                showErr('rdError', authErrMsg(e));
+            } finally {
+                btn.disabled = false; btn.innerText = 'Reset Undian';
+            }
+        };
+
         // ===================== BACKUP & PEMULIHAN (khusus admin) =====================
         //   /backupIndex/{id} -> ringkasan (tanggal, alasan, jumlah data)  — ringan, untuk daftar
         //   /backups/{id}     -> salinan lengkap participants / attendance / gifts / drawWinners
@@ -1220,7 +1321,9 @@
             
             container.innerHTML = `
                 <h4 class="font-bold text-slate-700 mb-3 text-left text-sm flex items-center justify-center md:justify-start gap-2 w-full">
-                    <span class="text-purple-600 text-lg">🏆</span> Riwayat Pemenang
+                    <span class="text-purple-600 text-lg">🏆</span> <span class="whitespace-nowrap">Riwayat Pemenang</span>
+                    <span class="text-[10px] font-bold bg-purple-50 text-purple-600 border border-purple-100 px-2 py-0.5 rounded-md">${state.drawWinners.length}</span>
+                    ${isAdmin() ? `<button onclick="window.openResetDraw()" class="ml-auto shrink-0 whitespace-nowrap text-[11px] font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded-lg transition-colors">🔄 Reset Undian</button>` : ''}
                 </h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1 no-scrollbar w-full">
                     ${state.drawWinners.slice().reverse().map(w => `
@@ -1504,6 +1607,11 @@
 
         db.ref('drawWinners').on('value', s => {
             state.drawWinners = s.val() ? Object.values(s.val()) : [];
+            // Jika pemenang yang sedang tampil sudah dihapus (reset dari perangkat mana pun) -> kembali ke posisi awal
+            if (!state.drawSpinning && (state.drawWinners.length === 0 ||
+                (state.drawShownPid && !state.drawWinners.some(w => w.participantId === state.drawShownPid)))) {
+                window.resetDrawBoxUI();
+            }
             if (state.tab === 'draw') window.renderDrawWinners();
             if (state.tab === 'data' && state.dataViewMode === 'draws') window.render();
         });
@@ -1881,6 +1989,7 @@
             btnDraw.disabled = true;
             btnDraw.classList.add('opacity-50', 'cursor-not-allowed');
             btnDraw.innerHTML = '🔄 Mengacak...';
+            state.drawSpinning = true;
             
             let counter = 0;
             
@@ -1895,6 +2004,7 @@
                     beep('success');
                     
                     const winner = pool[Math.floor(Math.random() * pool.length)];
+                    state.drawShownPid = winner.participantId;
                     
                     const participant = state.participants.find(p => p.id === winner.participantId);
                     const pin = participant && participant.qrCode ? participant.qrCode.slice(-4) : '0000';
@@ -1915,6 +2025,7 @@
                         timestamp: fmtDate()
                     }).catch(handleWriteError);
 
+                    state.drawSpinning = false;
                     btnDraw.disabled = false;
                     btnDraw.classList.remove('opacity-50', 'cursor-not-allowed');
                     btnDraw.innerHTML = '🎲 Acak Pemenang Lagi';
