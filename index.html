@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Absensi Event Natal 2026 - GKPS Tangerang</title>
-    
+
     <script>
         const originalWarn = console.warn;
         console.warn = function(...args) {
@@ -14,32 +14,32 @@
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
+
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    
+
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    
+
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
-        #reader { 
-            width: 100%; 
-            background: #f8fafc; 
+
+        #reader {
+            width: 100%;
+            background: #f8fafc;
             border-radius: 16px;
             border: 2px dashed #cbd5e1;
             overflow: hidden;
             position: relative;
             padding-bottom: 10px;
         }
-        #reader video { 
-            object-fit: cover; 
+        #reader video {
+            object-fit: cover;
             border-radius: 14px;
             width: 100% !important;
             max-height: 400px;
         }
-        
+
         #reader button {
             background-color: #059669; color: white; padding: 10px 20px;
             border-radius: 10px; border: none; font-weight: 700; margin: 10px auto;
@@ -48,10 +48,10 @@
             display: inline-block;
         }
         #reader button:hover { background-color: #047857; }
-        
+
         #reader a { color: #0284c7; font-weight: 600; text-decoration: none; margin: 10px; display: block; }
         #reader a:hover { text-decoration: underline; }
-        
+
         #reader__camera_selection {
             width: 90%; max-width: 300px; padding: 10px; margin: 10px auto;
             display: block; border-radius: 10px; border: 2px solid #e2e8f0;
@@ -69,10 +69,10 @@
         .stat-click:hover { background: rgba(255,255,255,0.25); }
         .stat-click:active { transform: scale(0.96); }
         img.qr-code { image-rendering: pixelated; mix-blend-mode: multiply; -webkit-touch-callout: default; }
-        
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
+
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
@@ -80,7 +80,7 @@
 
         .glass { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); }
         .glass-dark { background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        
+
         .ticket-edge {
             background: linear-gradient(135deg, transparent 10px, #ffffff 0) top left, linear-gradient(225deg, transparent 10px, #ffffff 0) top right, linear-gradient(315deg, transparent 10px, #ffffff 0) bottom right, linear-gradient(45deg, transparent 10px, #ffffff 0) bottom left;
             background-size: 50% 50%;
@@ -143,7 +143,7 @@
     </div>
 
     <div id="app" class="relative z-10 w-full max-w-md mx-auto md:max-w-4xl lg:max-w-6xl min-h-[100dvh] md:min-h-[calc(100vh-3rem)] bg-slate-50 md:shadow-2xl md:my-6 md:rounded-[2.5rem] overflow-hidden flex flex-col border border-slate-200/50">
-        
+
         <div id="loading" class="absolute inset-0 z-[9999] bg-white flex flex-col justify-center items-center">
             <div class="w-20 h-20 border-4 border-red-100 border-t-red-600 rounded-full animate-spin mb-4"></div>
             <div class="font-bold text-slate-600 text-lg tracking-tight">Memuat Sistem GKPS...</div>
@@ -152,14 +152,14 @@
 
         <header class="bg-gradient-to-br from-red-800 via-red-700 to-red-900 text-white p-6 pb-20 shadow-lg relative overflow-hidden">
             <div class="absolute top-0 right-0 w-64 h-64 bg-red-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2"></div>
-            
+
             <div class="relative z-10 flex justify-between items-start mb-6 max-w-5xl mx-auto w-full">
                 <div class="flex flex-col gap-2.5">
                     <div class="flex items-center gap-2">
                         <img src="LOGO-GKPS-ASLI-1.png" alt="Logo GKPS" class="w-10 h-10 bg-white rounded-full object-contain p-1 border-2 border-red-400/40 shadow-md" onerror="this.style.display='none'">
                         <img src="logo-tema-gkps.jpg" alt="Logo Tema" class="w-10 h-10 bg-white rounded-full object-cover p-0.5 border-2 border-red-400/40 shadow-md" onerror="this.style.display='none'">
                     </div>
-                    
+
                     <div>
                         <h1 class="text-3xl font-black tracking-tight leading-none mb-1 text-transparent bg-clip-text bg-gradient-to-r from-white to-red-100 drop-shadow-sm">NATAL 2026</h1>
                         <p class="text-red-100 text-[10px] font-bold tracking-widest uppercase opacity-95 leading-snug drop-shadow-md">
@@ -168,7 +168,7 @@
                         </p>
                     </div>
                 </div>
-                
+
                 <div class="flex flex-col items-end gap-2 mt-1">
                     <div class="text-right glass-dark px-4 py-2 rounded-2xl shadow-inner">
                         <div id="liveClock" class="text-xl font-mono font-bold tracking-tight text-white">00:00</div>
@@ -177,7 +177,7 @@
                     <button id="adminChip" onclick="window.adminChipClick()" class="glass-dark px-3 py-1.5 rounded-xl text-[10px] font-bold text-red-100 hover:text-white transition-colors max-w-[180px] truncate">🔐 Login Panitia</button>
                 </div>
             </div>
-            
+
             <div class="relative z-10 flex gap-3 overflow-x-auto md:justify-center pb-2 no-scrollbar snap-x max-w-5xl mx-auto w-full">
                 <div class="snap-center glass rounded-2xl p-4 flex-1 min-w-[100px] flex flex-col items-center justify-center relative overflow-hidden group">
                     <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
@@ -213,6 +213,9 @@
             <button onclick="window.setTab('draw')" id="tab-draw" class="snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-md">
                 <span class="text-lg">🎰</span><span>Undian</span>
             </button>
+            <button onclick="window.setTab('prize')" id="tab-prize" class="snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-md">
+                <span class="text-lg">🏆</span><span>Ambil Prize</span>
+            </button>
             <button onclick="window.setTab('data')" id="tab-data" class="snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-md">
                 <span class="text-lg">📊</span><span>Data</span>
             </button>
@@ -236,7 +239,7 @@
                     <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-xl">✅</div>
                     <h3 class="text-xl font-bold text-slate-800">Cek Data</h3>
                 </div>
-                
+
                 <div class="bg-slate-50 p-4 rounded-2xl space-y-4 mb-6 border border-slate-100">
                     <div>
                         <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Nama Lengkap</div>
@@ -257,7 +260,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="flex gap-3">
                     <button onclick="window.closeModal('confirmModal')" class="flex-1 py-3.5 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors">Batal</button>
                     <button onclick="window.processSave()" class="flex-1 py-3.5 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-200 transition-colors">Simpan Data</button>
@@ -270,7 +273,7 @@
         <div class="min-h-[100dvh] flex px-4 py-20">
             <div class="w-full max-w-sm transform scale-95 transition-transform duration-300 relative group m-auto">
                 <button onclick="window.closeModal('ticketModal')" class="absolute -top-14 right-0 w-10 h-10 flex items-center justify-center text-white bg-white/20 hover:bg-white/40 rounded-full transition-colors backdrop-blur-sm z-50 shadow-sm">✕</button>
-                
+
                 <div class="ticket-edge bg-white rounded-3xl overflow-hidden shadow-2xl relative">
                     <div class="bg-red-700 p-6 text-center relative overflow-hidden">
                         <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] opacity-50"></div>
@@ -284,7 +287,7 @@
                             <div class="text-red-100 text-[8px] uppercase tracking-wider font-bold leading-tight">Gereja Kristen Protestan Simalungun<br>Tangerang</div>
                         </div>
                     </div>
-                    
+
                     <div class="p-6 text-center bg-white relative pb-3">
                         <h2 id="ticName" class="text-2xl font-bold text-slate-800 leading-tight mb-3">Nama Peserta</h2>
                         <div class="flex justify-center flex-wrap gap-2 mb-6">
@@ -292,26 +295,26 @@
                             <span id="ticClass" class="px-4 py-1.5 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-full border border-indigo-100">Kelas</span>
                             <span id="ticSector" class="px-4 py-1.5 bg-sky-50 text-sky-700 text-xs font-bold rounded-full border border-sky-100">Sektor</span>
                         </div>
-                        
+
                         <div class="relative inline-block p-4 bg-white border-2 border-slate-100 rounded-2xl shadow-sm mb-2">
                             <div class="absolute inset-0 border-2 border-dashed border-red-200 rounded-2xl m-2 pointer-events-none"></div>
                             <img id="ticQR" src="" class="w-48 object-contain qr-code relative z-10" alt="QR Code Tiket" style="touch-action: pan-y;">
                         </div>
-                        
+
                         <div class="mb-3 mt-1 inline-block bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 shadow-inner">
                             <span class="text-[10px] text-slate-500 font-bold uppercase mr-1 tracking-wider">PIN TIKET:</span>
                             <span id="ticPin" class="text-sm font-black text-slate-800 font-mono tracking-widest">0000</span>
                         </div>
-                        
+
                         <div class="text-[10px] text-slate-400 font-medium uppercase tracking-widest mb-3 block">Scan for Attendance</div>
-                        
+
                         <div class="bg-blue-50 text-blue-700 text-[10px] px-4 py-2.5 rounded-xl flex items-start gap-2.5 text-left border border-blue-100 mx-auto max-w-[280px]">
                             <span class="text-sm leading-none mt-0.5">💡</span>
                             <span class="leading-relaxed"><b>Tips HP:</b> Agar masuk ke Galeri, sentuh & tahan gambar QR di atas, lalu pilih <b>"Simpan Gambar"</b>.</span>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="flex gap-2 mt-6">
                     <button onclick="window.downloadBarcode()" class="flex-1 py-3 bg-white text-slate-800 font-bold rounded-2xl shadow-lg hover:bg-slate-50 transition-all flex flex-col items-center justify-center gap-1 text-[11px]">
                         <span class="text-lg">📥</span> Unduh
@@ -453,6 +456,7 @@
                     <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer"><input id="rcAttendance" type="checkbox" checked class="w-4 h-4 accent-amber-600"><span class="text-sm font-bold text-slate-700 flex-1">📋 Absensi / Check-in</span><span id="rcAttendanceCount" class="text-xs font-bold text-slate-400">0</span></label>
                     <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer"><input id="rcGifts" type="checkbox" class="w-4 h-4 accent-amber-600"><span class="text-sm font-bold text-slate-700 flex-1">🎁 Pengambilan Hadiah</span><span id="rcGiftsCount" class="text-xs font-bold text-slate-400">0</span></label>
                     <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer"><input id="rcDraws" type="checkbox" class="w-4 h-4 accent-amber-600"><span class="text-sm font-bold text-slate-700 flex-1">🎰 Pemenang Undian</span><span id="rcDrawsCount" class="text-xs font-bold text-slate-400">0</span></label>
+                    <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer"><input id="rcPrizes" type="checkbox" class="w-4 h-4 accent-amber-600"><span class="text-sm font-bold text-slate-700 flex-1">🏆 Pengambilan Door Prize</span><span id="rcPrizesCount" class="text-xs font-bold text-slate-400">0</span></label>
                 </div>
                 <div class="mt-4">
                     <label for="rcConfirm" class="block text-xs font-bold text-slate-500 mb-1 ml-1">Ketik <b>RESET</b> untuk konfirmasi</label>
@@ -475,7 +479,7 @@
                     <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-xl">🔄</div>
                     <h3 class="text-xl font-bold text-slate-800">Reset Undian Door Prize</h3>
                 </div>
-                <p class="text-xs text-slate-500 mb-4 font-medium">Daftar pemenang dikosongkan dan undian kembali ke <b>posisi awal</b>. Peserta yang sudah menang bisa ikut diundi lagi. Data peserta, absensi, hadiah &amp; pengaturan kelas <b>tidak berubah</b>.</p>
+                <p class="text-xs text-slate-500 mb-4 font-medium">Daftar pemenang dikosongkan dan undian kembali ke <b>posisi awal</b>. Peserta yang sudah menang bisa ikut diundi lagi. Data peserta, absensi, hadiah &amp; pengaturan kelas <b>tidak berubah</b>. Catatan <b>pengambilan door prize</b> milik pemenang yang di-reset ikut dihapus.</p>
                 <label for="rdScope" class="block text-xs font-bold text-slate-500 mb-1 ml-1">Pemenang yang di-reset</label>
                 <select id="rdScope" onchange="window.updateResetDrawInfo()" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:outline-none focus:border-purple-400"></select>
                 <div id="rdInfo" class="mt-3 text-xs font-bold text-purple-700 bg-purple-50 border border-purple-100 rounded-xl px-3 py-2.5"></div>
@@ -544,7 +548,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyBzka8Ps_nf-8zDA2tMDmqEMw6zMoy3aeM",
             authDomain: "eventnatal2025.firebaseapp.com",
-            databaseURL: "https://eventnatal2025-default-rtdb.asia-southeast1.firebasedatabase.app/", 
+            databaseURL: "https://eventnatal2025-default-rtdb.asia-southeast1.firebasedatabase.app/",
             projectId: "eventnatal2025",
             storageBucket: "eventnatal2025.firebasestorage.app",
             messagingSenderId: "961570070334",
@@ -558,11 +562,11 @@
         // Akses panitia: login Firebase Auth + UID terdaftar di node /admins (lihat database.rules.json)
 
         let state = {
-            participants: [], attendance: [], gifts: [], drawWinners: [],
-            tab: 'register', dataViewMode: 'attendance', 
+            participants: [], attendance: [], gifts: [], drawWinners: [], prizeClaims: [],
+            tab: 'register', dataViewMode: 'attendance',
             scanner: null, tempData: null, searchTerm: '',
             classFilter: 'Semua',
-            isAdminAuthenticated: false 
+            isAdminAuthenticated: false
         };
 
         // ===================== AKUN PANITIA & HAK AKSES (FIREBASE AUTH) =====================
@@ -575,11 +579,17 @@
             { key: 'manual', label: 'Check-in Manual',     icon: '✍️' },
             { key: 'gift',   label: 'Hadiah (scan & manual)', icon: '🎁' },
             { key: 'draw',   label: 'Undian Door Prize',   icon: '🎰' },
+            { key: 'prize',  label: 'Ambil Door Prize (scan & manual)', icon: '🏆' },
             { key: 'export', label: 'Download / Export Data', icon: '📥' }
         ];
         const ALL_PERMS = () => PERMS.reduce((o, p) => { o[p.key] = true; return o; }, {});
-        const TAB_PERMS = { scan: ['scan', 'manual'], gift: ['gift'], draw: ['draw'], users: ['__admin'], backup: ['__admin'] };
-        const TAB_LABELS = { scan: 'Absen', gift: 'Hadiah', draw: 'Undian Door Prize', users: 'Pengguna', backup: 'Backup' };
+        const TAB_PERMS = { scan: ['scan', 'manual'], gift: ['gift'], draw: ['draw'], prize: ['prize'], users: ['__admin'], backup: ['__admin'] };
+        const TAB_LABELS = { scan: 'Absen', gift: 'Hadiah', draw: 'Undian Door Prize', prize: 'Ambil Door Prize', users: 'Pengguna', backup: 'Backup' };
+        // Tab yang memakai kamera scanner + izin yang dibutuhkan (kamera / manual)
+        const SCAN_TABS = ['scan', 'gift', 'prize'];
+        const isScanTab = (t) => SCAN_TABS.includes(t);
+        const camPermOf = (t) => t === 'gift' ? 'gift' : (t === 'prize' ? 'prize' : 'scan');
+        const manPermOf = (t) => t === 'gift' ? 'gift' : (t === 'prize' ? 'prize' : 'manual');
 
         let pendingAdminAction = null;
         let profileRef = null, usersRef = null, secondaryApp = null;
@@ -668,7 +678,7 @@
 
             if (prevKey === userKey(state.user) || typeof window.setTab !== 'function') return;
             if (!canOpenTab(state.tab)) { window.setTab('register'); return; }
-            if (state.tab === 'scan' || state.tab === 'gift') { window.stopScanner(); window.setTab(state.tab); }
+            if (isScanTab(state.tab)) { window.stopScanner(); window.setTab(state.tab); }
             else if (state.tab !== 'register') window.render();
         };
 
@@ -976,6 +986,8 @@
                 document.getElementById('rcAttendanceCount').innerText = state.attendance.length + ' data';
                 document.getElementById('rcGiftsCount').innerText = state.gifts.length + ' data';
                 document.getElementById('rcDrawsCount').innerText = state.drawWinners.length + ' data';
+                document.getElementById('rcPrizesCount').innerText = state.prizeClaims.length + ' data';
+                document.getElementById('rcPrizes').checked = false;
                 document.getElementById('rcAttendance').checked = true;
                 document.getElementById('rcGifts').checked = false;
                 document.getElementById('rcDraws').checked = false;
@@ -991,6 +1003,7 @@
             if (document.getElementById('rcAttendance').checked) targets.push(['attendance', 'Absensi']);
             if (document.getElementById('rcGifts').checked) targets.push(['gifts', 'Hadiah']);
             if (document.getElementById('rcDraws').checked) targets.push(['drawWinners', 'Undian']);
+            if (document.getElementById('rcPrizes').checked) targets.push(['prizeClaims', 'Pengambilan Door Prize']);
             if (targets.length === 0) { showErr('rcError', 'Pilih minimal satu data yang akan di-reset.'); return; }
             if ($val('rcConfirm').trim().toUpperCase() !== 'RESET') { showErr('rcError', 'Ketik RESET untuk konfirmasi.'); return; }
             const btn = document.getElementById('rcBtn');
@@ -1068,6 +1081,7 @@
                 if (!(await safetyBackup('Otomatis: sebelum Reset Undian (' + label + ')'))) return;
                 btn.innerText = 'Memproses...';
                 let removed = 0;
+                const resetPids = new Set((scope === '__all__' ? state.drawWinners : state.drawWinners.filter(w => (w.classGrade || '-') === scope)).map(w => w.participantId));
                 if (scope === '__all__') {
                     removed = state.drawWinners.length;
                     await db.ref('drawWinners').set(null);
@@ -1078,6 +1092,11 @@
                     removed = Object.keys(upd).length;
                     if (removed) await db.ref('drawWinners').update(upd);
                 }
+                // Catatan pengambilan door prize milik pemenang yang di-reset ikut dihapus
+                const pzSnap = await db.ref('prizeClaims').once('value');
+                const pzUpd = {};
+                Object.entries(pzSnap.val() || {}).forEach(([k, c]) => { if (c && resetPids.has(c.participantId)) pzUpd[k] = null; });
+                if (Object.keys(pzUpd).length) await db.ref('prizeClaims').update(pzUpd);
                 window.closeModal('resetDrawModal');
                 window.resetDrawBoxUI();
                 alert(`✅ Undian ${label} berhasil di-reset (${removed} pemenang dihapus).\n\nUndian kembali ke posisi awal dan peserta bisa diundi lagi.\n\n🛡️ Daftar pemenang sebelum reset tersimpan di menu Backup.`);
@@ -1097,7 +1116,8 @@
             ['participants', 'Peserta (pendaftaran)', '📝'],
             ['attendance', 'Absensi', '📋'],
             ['gifts', 'Hadiah', '🎁'],
-            ['drawWinners', 'Undian', '🎰']
+            ['drawWinners', 'Undian', '🎰'],
+            ['prizeClaims', 'Ambil Door Prize', '🏆']
         ];
         const BACKUP_FORMAT = 'natal2026-backup';
         const BACKUP_INTERVAL_MS = 60 * 60 * 1000;   // backup berkala: tiap 1 jam
@@ -1202,7 +1222,7 @@
             if (reason === null) return;
             try {
                 const b = await window.createBackup(reason.trim() || 'Backup manual', 'manual');
-                alert(`✅ Backup tersimpan (${b.createdAtText}).\n\nPeserta: ${b.counts.participants} · Absensi: ${b.counts.attendance} · Hadiah: ${b.counts.gifts} · Undian: ${b.counts.drawWinners}`);
+                alert(`✅ Backup tersimpan (${b.createdAtText}).\n\nPeserta: ${b.counts.participants} · Absensi: ${b.counts.attendance} · Hadiah: ${b.counts.gifts} · Undian: ${b.counts.drawWinners} · Ambil Door Prize: ${b.counts.prizeClaims || 0}`);
             } catch (e) { alert(authErrMsg(e)); }
         }, 'Backup Data');
 
@@ -1257,7 +1277,7 @@
                 <div class="text-[11px] text-slate-500 mt-0.5">${escHTML(m.reason || '')}${m.by ? ' · oleh ' + escHTML(m.by) : ''}${source.kind === 'file' ? ' · dari file ' + escHTML(source.fileName || '') : ''}</div>`;
             document.getElementById('rsNodes').innerHTML = BACKUP_NODES.map(([n, label, icon]) => {
                 const inBackup = countOf(source.data[n]);
-                const now = n === 'participants' ? state.participants.length : n === 'attendance' ? state.attendance.length : n === 'gifts' ? state.gifts.length : state.drawWinners.length;
+                const now = (state[n === 'participants' ? 'participants' : n] || []).length;
                 return `
                 <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer">
                     <input id="rsNode-${n}" type="checkbox" checked class="w-4 h-4 accent-sky-600">
@@ -1373,12 +1393,12 @@
         window.renderDrawWinners = () => {
             const container = document.getElementById('drawWinnersListContainer');
             if (!container) return;
-            
+
             if (state.drawWinners.length === 0) {
                 container.innerHTML = `<div class="text-center py-6 border-2 border-dashed border-purple-100 bg-purple-50 rounded-2xl text-purple-400 text-xs font-bold uppercase tracking-wider shadow-inner md:col-span-full">Belum ada pemenang undian</div>`;
                 return;
             }
-            
+
             container.innerHTML = `
                 <h4 class="font-bold text-slate-700 mb-3 text-left text-sm flex items-center justify-center md:justify-start gap-2 w-full">
                     <span class="text-purple-600 text-lg">🏆</span> <span class="whitespace-nowrap">Riwayat Pemenang</span>
@@ -1391,6 +1411,9 @@
                             <div class="text-left">
                                 <div class="font-bold text-slate-800 text-sm leading-tight">${w.name}</div>
                                 <div class="text-[10px] text-slate-500 mt-1 font-semibold">${w.classGrade} • ${w.sector}</div>
+                                ${(() => { const c = prizeClaimOf(w.participantId); return c
+                                    ? `<div class="inline-block mt-1.5 text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-md">✓ Prize diambil ${escHTML(getTimeStr(c.timestamp))}</div>`
+                                    : `<div class="inline-block mt-1.5 text-[9px] font-bold text-amber-700 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-md">⏳ Belum diambil</div>`; })()}
                             </div>
                             <div class="bg-purple-50 text-purple-700 px-3 py-1.5 rounded-lg text-xs font-black font-mono border border-purple-100 shadow-inner flex flex-col items-center shrink-0 ml-2">
                                 <span class="text-[8px] uppercase tracking-widest text-purple-400 leading-none mb-0.5">PIN</span>
@@ -1644,7 +1667,7 @@
             window.refreshPeopleBoard();
             document.getElementById('loading').style.display = 'none';
         });
-        
+
         db.ref('attendance').on('value', s => {
             state.attendance = s.val() ? Object.values(s.val()) : [];
             updateStats();
@@ -1673,8 +1696,16 @@
                 window.resetDrawBoxUI();
             }
             if (state.tab === 'draw') window.renderDrawWinners();
-            if (state.tab === 'data' && state.dataViewMode === 'draws') window.render();
+            if (state.tab === 'data' && (state.dataViewMode === 'draws' || state.dataViewMode === 'prizes')) window.render();
+            if (state.tab === 'prize') window.refreshManualList();
         });
+
+        db.ref('prizeClaims').on('value', s => {
+            state.prizeClaims = s.val() ? Object.values(s.val()) : [];
+            if (state.tab === 'draw') window.renderDrawWinners();
+            if (state.tab === 'data' && state.dataViewMode === 'prizes') window.render();
+            if (state.tab === 'prize') window.refreshManualList();
+        }, err => console.warn('Data pengambilan door prize tidak terbaca', err));
 
         function updateStats() {
             document.getElementById('statRegistered').innerText = state.participants.length;
@@ -1688,39 +1719,39 @@
             const cat = document.getElementById('inCategory').value;
             const cls = document.getElementById('inClass').value;
             const sec = document.getElementById('inSector').value;
-            
+
             if(!name || !cat || !cls || !sec) { alert("Mohon lengkapi Nama, Kategori, Kelas, dan Sektor!"); return; }
-            
+
             state.tempData = { name, cat, cls, sec };
-            
+
             document.getElementById('confName').innerText = name;
             document.getElementById('confCategory').innerText = cat;
             document.getElementById('confClass').innerText = cls;
             document.getElementById('confSector').innerText = sec;
-            
+
             const m = document.getElementById('confirmModal');
             m.classList.remove('hidden');
-            setTimeout(() => { 
-                m.classList.remove('opacity-0'); 
+            setTimeout(() => {
+                m.classList.remove('opacity-0');
                 const scaleContainer = m.querySelector('.transform.scale-95') || m.querySelector('.transform.scale-100');
-                if(scaleContainer) scaleContainer.classList.replace('scale-95','scale-100'); 
+                if(scaleContainer) scaleContainer.classList.replace('scale-95','scale-100');
             }, 10);
         };
 
         window.processSave = () => {
             if(!state.tempData) return;
             const { name, cat, cls, sec } = state.tempData;
-            const id = Date.now().toString(); 
+            const id = Date.now().toString();
             const qr = `NATAL2026-${id.slice(-6)}`;
-            
+
             db.ref('participants').push({
                 id, name, category: cat, classGrade: cls, sector: sec, qrCode: qr,
                 registeredAt: fmtDate(), timestamp: Date.now()
             }).catch(handleWriteError);
-            
+
             window.closeModal('confirmModal');
             document.getElementById('inName').value = '';
-            
+
             window.showTicket(name, cat, cls, sec, qr);
         };
 
@@ -1728,7 +1759,7 @@
             const nameInput = document.getElementById('findName');
             const sectorInput = document.getElementById('findSector');
             const resultsContainer = document.getElementById('findResults');
-            
+
             if(!nameInput || !sectorInput) return;
 
             const name = nameInput.value.trim().toLowerCase();
@@ -1754,7 +1785,7 @@
                             </p>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                     `;
-                    
+
                     foundList.forEach(p => {
                         const safeName = (p.name || '').replace(/'/g, "\\'");
                         const safeCategory = p.category || '-';
@@ -1762,9 +1793,9 @@
                         const safeSector = p.sector || '-';
                         const pName = p.name || 'Peserta';
                         const qr = p.qrCode ? p.qrCode : ("NATAL2026-" + (p.id ? p.id.slice(-6) : ""));
-                        
+
                         htmlContent += `
-                            <button onclick="window.showTicket('${safeName}', '${safeCategory}', '${safeClass}', '${safeSector}', '${qr}')" 
+                            <button onclick="window.showTicket('${safeName}', '${safeCategory}', '${safeClass}', '${safeSector}', '${qr}')"
                                     class="w-full text-left bg-white p-3 border border-amber-100 rounded-xl shadow-sm hover:bg-amber-100 hover:border-amber-300 transition-colors flex justify-between items-center group">
                                 <div class="min-w-0 pr-2">
                                     <div class="font-bold text-slate-800 text-sm group-hover:text-amber-800 truncate">${pName}</div>
@@ -1774,7 +1805,7 @@
                             </button>
                         `;
                     });
-                    
+
                     htmlContent += `
                             </div>
                         </div>
@@ -1788,15 +1819,50 @@
         };
 
         window.secureProcess = (pid) => {
-            const isGift = state.tab === 'gift';
-            window.requirePerm(isGift ? 'gift' : 'manual', () => window.processScannedID(pid), isGift ? 'Ambil Hadiah' : 'Check-in Manual');
+            const t = state.tab;
+            const title = t === 'gift' ? 'Ambil Hadiah' : (t === 'prize' ? 'Ambil Door Prize' : 'Check-in Manual');
+            window.requirePerm(manPermOf(t), () => window.processScannedID(pid), title);
         };
 
         window.processScannedID = (pid) => {
             const p = state.participants.find(x => x.id === pid);
             if(!p) return;
             if (state.tab === 'gift') window.claimGift(p);
+            else if (state.tab === 'prize') window.claimDoorPrize(p);
             else window.doCheckIn(p);
+        };
+
+        // ---------- Pengambilan hadiah Door Prize ----------
+        const drawWinnerOf = (pid) => state.drawWinners.find(w => w.participantId === pid);
+        const prizeClaimOf = (pid) => state.prizeClaims.find(c => c.participantId === pid);
+        const prizeCounterHTML = () => {
+            const total = state.drawWinners.length;
+            const taken = state.drawWinners.filter(w => prizeClaimOf(w.participantId)).length;
+            return `<span class="bg-purple-50 text-purple-700 border border-purple-100 px-3 py-1.5 rounded-full">🏆 ${total} pemenang</span>
+                <span class="bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-1.5 rounded-full">✓ ${taken} diambil</span>
+                <span class="bg-amber-50 text-amber-700 border border-amber-100 px-3 py-1.5 rounded-full">⏳ ${total - taken} belum</span>`;
+        };
+
+        window.claimDoorPrize = (p) => {
+            const win = drawWinnerOf(p.id);
+            if (!win) {
+                beep('fail'); window.showScanResult(false, `❌ ${escHTML(p.name)} Bukan Pemenang Door Prize`);
+                return;
+            }
+            const claimed = prizeClaimOf(p.id);
+            if (claimed) {
+                beep('fail'); window.showScanResult(false, `⚠️ ${escHTML(p.name)} Sudah Ambil Door Prize!<br><span class="text-xs font-normal opacity-90 mt-1 block">Diambil jam ${escHTML(getTimeStr(claimed.timestamp))} WIB</span>`, 'bg-amber-500');
+                return;
+            }
+            beep('success');
+            const ts = fmtDate();
+            db.ref('prizeClaims').push({
+                id: Date.now().toString(), participantId: p.id, name: p.name,
+                category: p.category || '', classGrade: p.classGrade || '-', sector: p.sector || '-',
+                pin: win.pin || '', wonAt: win.timestamp || '', timestamp: ts,
+                by: state.user ? state.user.email : ''
+            }).catch(handleWriteError);
+            window.showScanResult(true, `🏆 ${escHTML(p.name)} Ambil Door Prize!<br><span class="text-xs font-normal opacity-90 mt-1 block">Jam Ambil: ${getTimeStr(ts)} WIB</span>`, 'bg-purple-600');
         };
 
         window.doCheckIn = (p) => {
@@ -1832,27 +1898,27 @@
         window.initScanner = () => {
             if(state.scanner) return;
             if(!document.getElementById('reader')) return; // akun tanpa akses kamera
-            
-            const config = { 
-                fps: 10, 
-                qrbox: 250, 
+
+            const config = {
+                fps: 10,
+                qrbox: 250,
                 rememberLastUsedCamera: true
             };
-            
+
             state.scanner = new Html5QrcodeScanner("reader", config, false);
-            
+
             state.scanner.render((decodedText) => {
                 try { if(state.scanner) state.scanner.pause(true); } catch(err) {}
-                
+
                 const p = state.participants.find(x => x.qrCode === decodedText);
-                
+
                 if(p) {
-                    if (!can(state.tab === 'gift' ? 'gift' : 'scan')) { beep('fail'); window.showScanResult(false, "⛔ Akun Anda tidak punya akses scan"); }
-                    else window.processScannedID(p.id); 
-                } else { 
-                    beep('fail'); window.showScanResult(false, "❌ QR Code Tidak Dikenali"); 
+                    if (!can(camPermOf(state.tab))) { beep('fail'); window.showScanResult(false, "⛔ Akun Anda tidak punya akses scan"); }
+                    else window.processScannedID(p.id);
+                } else {
+                    beep('fail'); window.showScanResult(false, "❌ QR Code Tidak Dikenali");
                 }
-                
+
                 setTimeout(() => { try { if(state.scanner) state.scanner.resume(); } catch(err) {} }, 2500);
             }, (error) => {});
         };
@@ -1877,23 +1943,47 @@
 
         window.handleSearch = (el) => {
             state.searchTerm = el.value.toLowerCase();
+            window.refreshManualList();
+        };
+
+        // Tab Ambil Prize: daftar hanya berisi pemenang undian (tampil walau belum mengetik)
+        window.refreshManualList = () => {
+            const pzCnt = document.getElementById('pzCounter');
+            if (pzCnt && state.tab === 'prize') pzCnt.innerHTML = prizeCounterHTML();
             const container = document.getElementById('manual-list');
             if(!container) return;
-            const filtered = state.participants.filter(p => p.name.toLowerCase().includes(state.searchTerm));
+            const term = state.searchTerm || '';
+            const isPrize = state.tab === 'prize';
+            let base = state.participants;
+            if (isPrize) {
+                base = state.drawWinners.slice().reverse()
+                    .map(w => state.participants.find(p => p.id === w.participantId))
+                    .filter(Boolean);
+                if (base.length === 0) {
+                    container.innerHTML = '<div class="text-center text-slate-400 py-6 text-sm md:col-span-full">Belum ada pemenang undian</div>';
+                    return;
+                }
+            }
+            const filtered = base.filter(p => String(p.name || '').toLowerCase().includes(term));
             if(filtered.length === 0) {
                 container.innerHTML = '<div class="text-center text-slate-400 py-6 text-sm md:col-span-full">Nama tidak ditemukan</div>';
                 return;
             }
-            container.innerHTML = window.generateListHTML(filtered, state.tab === 'gift');
+            container.innerHTML = window.generateListHTML(filtered, state.tab === 'gift' ? 'gift' : (isPrize ? 'prize' : 'scan'));
         };
 
-        window.generateListHTML = (list, isGiftMode) => {
+        window.generateListHTML = (list, mode) => {
+            const isGiftMode = mode === true || mode === 'gift';
             return list.map(p => {
                 let statusBadge = ''; let actionBtn = '';
                 const claimedGift = state.gifts.find(g => g.participantId === p.id);
                 const pinID = p.id ? p.id.slice(-4) : '0000';
-                
-                if (isGiftMode) {
+
+                if (mode === 'prize') {
+                    const pz = prizeClaimOf(p.id);
+                    if (pz) statusBadge = `<span class="text-purple-700 font-bold text-xs bg-purple-50 border border-purple-100 px-3 py-1.5 rounded-lg flex items-center gap-1"><span class="text-sm">✓</span> Diambil <span class="hidden md:inline opacity-70 ml-1 font-mono">${getTimeStr(pz.timestamp)}</span></span>`;
+                    else actionBtn = `<button onclick="window.secureProcess('${p.id}')" class="bg-purple-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-purple-700 active:scale-95 transition-transform flex items-center gap-1 shadow-sm shadow-purple-200">${state.isAdminAuthenticated ? '' : '🔒 '}Ambil Prize</button>`;
+                } else if (isGiftMode) {
                     if (claimedGift) statusBadge = `<span class="text-red-600 font-bold text-xs bg-red-50 border border-red-100 px-3 py-1.5 rounded-lg flex items-center gap-1"><span class="text-sm">✓</span> Diambil <span class="hidden md:inline opacity-70 ml-1 font-mono">${getTimeStr(claimedGift.timestamp)}</span></span>`;
                     else actionBtn = `<button onclick="window.secureProcess('${p.id}')" class="bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-700 active:scale-95 transition-transform flex items-center gap-1 shadow-sm shadow-red-200">${state.isAdminAuthenticated ? '' : '🔒 '}Ambil</button>`;
                 } else {
@@ -1931,18 +2021,19 @@
                 return;
             }
 
-            if((state.tab === 'scan' || state.tab === 'gift') && (t !== 'scan' && t !== 'gift')) window.stopScanner();
+            if(isScanTab(state.tab) && state.tab !== t) window.stopScanner();
             state.tab = t;
-            
-            const tabs = ['register','find','scan','gift','draw','data','users','backup'];
+            state.searchTerm = '';
+
+            const tabs = ['register','find','scan','gift','draw','prize','data','users','backup'];
             tabs.forEach(x => {
                 const btn = document.getElementById(`tab-${x}`);
                 if(x === t) {
                     let bgCol = 'bg-red-600';
-                    if (t === 'draw') bgCol = 'bg-purple-600'; 
+                    if (t === 'draw' || t === 'prize') bgCol = 'bg-purple-600';
                     if (t === 'users') bgCol = 'bg-slate-800';
                     if (t === 'backup') bgCol = 'bg-sky-700';
-                    
+
                     btn.className = `snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-lg ${bgCol} text-white -translate-y-1`;
                 } else {
                     btn.className = "snap-center flex-none min-w-[90px] md:min-w-[110px] py-3.5 px-4 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center gap-1 shadow-sm bg-white text-slate-400 hover:text-slate-600 hover:bg-slate-50";
@@ -1950,11 +2041,11 @@
                 if ((x === 'users' || x === 'backup') && !isAdmin()) btn.classList.add('hidden');
             });
             window.render();
-            
+
             /* Catatan Keamanan: Akses Kamera mungkin akan diblokir browser jika file dibuka langsung tanpa web server */
-            if(t === 'scan' || t === 'gift') setTimeout(() => window.initScanner(), 300);
+            if(isScanTab(t)) setTimeout(() => window.initScanner(), 300);
         };
-        
+
         window.setRegisterFilter = (filterName) => {
             state.classFilter = filterName;
             window.renderParticipantListOnly();
@@ -1981,7 +2072,7 @@
                     container.innerHTML = `<div class="text-center py-10 bg-white rounded-2xl border-2 border-dashed border-slate-200 mt-6 max-w-5xl mx-auto w-full"><div class="text-4xl mb-3 opacity-50">📝</div><div class="text-sm font-medium text-slate-500">Belum ada peserta terdaftar</div></div>`;
                     return;
                 }
-                
+
                 container.innerHTML = `
                     <div class="mt-6 mb-2 max-w-5xl mx-auto w-full">
                         <div class="flex justify-between items-center px-1 mb-3">
@@ -2076,13 +2167,13 @@
                 window.refreshDrawClassUI();
                 return;
             }
-            
+
             let pool = state.attendance.filter(a => !state.drawWinners.some(w => w.participantId === a.participantId));
-            
+
             if (selectedClass !== 'Semua') {
                 pool = pool.filter(a => a.classGrade === selectedClass);
             }
-            
+
             if (pool.length === 0) {
                 alert(`❌ Belum ada peserta yang memenuhi syarat untuk kelas: ${selectedClass}\n(Atau semua peserta yang hadir di kelas ini sudah memenangkan hadiah)`);
                 return;
@@ -2092,13 +2183,13 @@
             const drawName = document.getElementById('drawName');
             const drawDetails = document.getElementById('drawDetails');
             const btnDraw = document.getElementById('btnDraw');
-            
+
             drawBox.classList.remove('hidden');
             drawBox.classList.remove('bg-gradient-to-br', 'from-purple-600', 'to-indigo-700', 'border-purple-400', 'animate-pulse-soft');
             drawBox.classList.add('bg-slate-800', 'border-slate-700');
             drawName.classList.remove('text-yellow-300');
             drawName.classList.add('text-white');
-            
+
             btnDraw.disabled = true;
             btnDraw.classList.add('opacity-50', 'cursor-not-allowed');
             btnDraw.innerHTML = '🎅 Santa sedang mengacak...';
@@ -2125,32 +2216,32 @@
                 drawRestartAnim(drawName, 'name-roll');
                 beep('tick');
                 counter++;
-                
+
                 if (counter < STEPS) {
                     const t = counter / STEPS;
                     setTimeout(tick, 55 + 430 * t * t * t);
-                } else { 
+                } else {
                     drawFxClear();
                     drawBox.classList.remove('draw-spinning');
                     drawBox.classList.add('draw-won');
                     if (drawLabel) drawLabel.innerText = '🏆 Pemenang Door Prize';
                     beep('success'); setTimeout(() => beep('success'), 160);
-                    
+
                     const winner = pool[Math.floor(Math.random() * pool.length)];
                     state.drawShownPid = winner.participantId;
-                    
+
                     const participant = state.participants.find(p => p.id === winner.participantId);
                     const pin = participant && participant.qrCode ? participant.qrCode.slice(-4) : '0000';
 
                     drawBox.classList.remove('bg-slate-800', 'border-slate-700');
                     drawBox.classList.add('bg-gradient-to-br', 'from-purple-600', 'to-indigo-700', 'border-purple-400', 'animate-pulse-soft');
-                    
+
                     drawName.innerText = winner.name;
                     drawName.classList.replace('text-white', 'text-yellow-300');
                     drawRestartAnim(drawName, 'name-win');
                     drawConfetti();
                     drawDetails.innerHTML = `🎉 KELAS ${escHTML(String(winner.classGrade || '-').toUpperCase())} | ${escHTML(winner.sector)} 🎉<br><span class="inline-block mt-2 bg-purple-900 text-purple-200 px-3 py-1 rounded-lg border border-purple-500 font-mono text-xs tracking-widest">PIN TIKET: ${pin}</span>`;
-                    
+
                     db.ref('drawWinners').push({
                         participantId: winner.participantId,
                         name: winner.name,
@@ -2171,7 +2262,7 @@
 
         window.render = () => {
             const root = document.getElementById('content-area');
-            
+
             if (state.tab === 'register') {
                 if (!document.getElementById('registration-form')) {
                     root.innerHTML = `
@@ -2258,7 +2349,7 @@
                                     <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400">▼</div>
                                 </div>
                             </div>
-                            
+
                             <div class="flex flex-col gap-2">
                                 <button onclick="window.findMyTicket()" class="w-full mt-4 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-lg shadow-blue-200 hover:bg-blue-700 hover:shadow-xl active:scale-[0.98] transition-all flex justify-center items-center gap-2">
                                     🔍 Temukan Tiket
@@ -2268,28 +2359,31 @@
                         </div>
                     </div>
                 `;
-            } else if (state.tab === 'scan' || state.tab === 'gift') {
+            } else if (isScanTab(state.tab)) {
                 const isGift = state.tab === 'gift';
-                const label = isGift ? 'Scanner Hadiah' : 'Scanner Kehadiran';
-                const hint = isGift ? 'Arahkan QR Code tiket untuk klaim hadiah' : 'Arahkan QR Code tiket untuk check-in';
-                const iconColor = isGift ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600';
-                const canCam = can(isGift ? 'gift' : 'scan');
-                const canMan = can(isGift ? 'gift' : 'manual');
+                const isPrize = state.tab === 'prize';
+                const label = isPrize ? 'Scanner Ambil Door Prize' : (isGift ? 'Scanner Hadiah' : 'Scanner Kehadiran');
+                const hint = isPrize ? 'Arahkan QR Code tiket pemenang untuk menandai door prize sudah diambil' : (isGift ? 'Arahkan QR Code tiket untuk klaim hadiah' : 'Arahkan QR Code tiket untuk check-in');
+                const iconColor = isPrize ? 'bg-purple-100 text-purple-600' : (isGift ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600');
+                const canCam = can(camPermOf(state.tab));
+                const canMan = can(manPermOf(state.tab));
+
 
                 root.innerHTML = `
                     <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 text-center mb-6 max-w-2xl mx-auto w-full">
                         <div class="flex items-center justify-center gap-3 mb-4">
                             <div class="w-10 h-10 rounded-xl ${iconColor} flex items-center justify-center text-xl shadow-inner">
-                                ${isGift ? '🎁' : '📷'}
+                                ${isPrize ? '🏆' : (isGift ? '🎁' : '📷')}
                             </div>
                             <h3 class="font-bold text-lg text-slate-800">${label}</h3>
                         </div>
-                        
+                        ${isPrize ? `<div id="pzCounter" class="flex flex-wrap justify-center gap-2 mb-4 text-[11px] font-bold">${prizeCounterHTML()}</div>` : ''}
+
                         <div id="scanRes" class="hidden"></div>
-                        
+
                         ${canCam ? `
                         <div id="reader" class="mb-2 mx-auto w-full max-w-sm"></div>
-                        
+
                         <p class="text-xs font-medium text-slate-400 px-4 mt-2">${hint}</p>
                         ${canMan ? `<p class="text-[10px] font-bold text-amber-600 bg-amber-50 px-3 py-2.5 rounded-xl mt-3 border border-amber-200 shadow-sm md:max-w-md md:mx-auto">
                             💡 Jika kamera tidak bisa diakses di laptop, Anda tetap bisa absensi menggunakan fasilitas <span class="text-emerald-700">"Pencarian Manual"</span> di bawah ini.
@@ -2299,7 +2393,7 @@
                             📵 Akun Anda tidak memiliki akses scan kamera.${canMan ? '<br><span class="text-xs font-medium">Gunakan Pencarian Manual di bawah.</span>' : ''}
                         </div>`}
                     </div>
-                    
+
                     ${canMan ? `
                     <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 max-w-4xl mx-auto w-full">
                         <div class="flex items-center justify-between mb-4 md:max-w-xl md:mx-auto">
@@ -2308,14 +2402,15 @@
                             </div>
                             <div class="text-[9px] font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded-md uppercase tracking-wider">Petugas</div>
                         </div>
-                        <input oninput="window.handleSearch(this)" type="text" placeholder="Ketik nama peserta..." class="w-full max-w-xl mx-auto block p-3.5 bg-slate-50 border border-slate-200 rounded-xl mb-3 text-sm font-medium text-slate-700 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-slate-400">
+                        <input oninput="window.handleSearch(this)" type="text" placeholder="${isPrize ? 'Cari nama pemenang...' : 'Ketik nama peserta...'}" class="w-full max-w-xl mx-auto block p-3.5 bg-slate-50 border border-slate-200 rounded-xl mb-3 text-sm font-medium text-slate-700 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-slate-400">
                         <div id="manual-list" class="max-h-[50vh] overflow-y-auto no-scrollbar rounded-xl border border-slate-100 bg-slate-50/50 p-2 grid grid-cols-1 md:grid-cols-2 gap-2">
                             <div class="text-center text-slate-400 py-6 text-sm md:col-span-full">Ketik untuk mencari data</div>
                         </div>
                     </div>
                     ` : ''}
                 `;
-            } 
+                if (isPrize && canMan) window.refreshManualList();
+            }
             else if (state.tab === 'draw') {
                 root.innerHTML = `
                     <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 relative overflow-hidden text-center max-w-3xl mx-auto w-full">
@@ -2324,7 +2419,7 @@
                             <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600 text-3xl shadow-inner mx-auto mb-4">🎰</div>
                             <h3 class="font-bold text-2xl text-slate-800 mb-1">Door Prize</h3>
                             <p class="text-[11px] text-slate-500 mb-8 font-medium">Acak pemenang dari peserta yang <b>sudah hadir (Scan)</b></p>
-                            
+
                             <div class="mb-6">
                                 <label class="block text-xs font-bold text-slate-500 mb-2 text-left ml-1">Filter Kelas Undian</label>
                                 <div class="relative">
@@ -2335,7 +2430,7 @@
                                 </div>
                             </div>
                             <div id="drawClassAdmin">${window.drawClassAdminHTML()}</div>
-                            
+
                             <div id="drawBox" class="bg-slate-800 p-8 rounded-[2rem] mb-6 border-4 border-slate-700 shadow-2xl hidden relative overflow-hidden transition-all duration-500">
                                 <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] opacity-20"></div>
                                 <div id="drawSnow" class="draw-snow"></div>
@@ -2392,12 +2487,12 @@
                                 <div id="drawName" class="text-3xl font-black text-white mb-2 relative z-10 drop-shadow-md min-h-[2.5rem] break-words">-</div>
                                 <div id="drawDetails" class="text-sm font-bold text-slate-400 relative z-10">-</div>
                             </div>
-                            
+
                             <button id="btnDraw" onclick="window.spinDoorPrize()" class="w-full py-4 bg-purple-600 text-white font-bold rounded-2xl shadow-lg shadow-purple-200 hover:bg-purple-700 active:scale-95 transition-all flex justify-center items-center gap-2">
                                 🎲 Acak Pemenang Sekarang
                             </button>
                         </div>
-                        
+
                         <div class="mt-8 border-t border-slate-100 pt-6 max-w-3xl mx-auto w-full">
                             <div id="drawWinnersListContainer"></div>
                         </div>
@@ -2526,10 +2621,12 @@
                 const isGiftView = state.dataViewMode === 'gifts';
                 const isDrawView = state.dataViewMode === 'draws';
                 const isAttView = state.dataViewMode === 'attendance';
-                
-                const dataToShow = isDrawView ? state.drawWinners : (isGiftView ? state.gifts : state.attendance);
-                const headerText = isDrawView ? 'Laporan Pemenang Undian' : (isGiftView ? 'Laporan Pengambilan Hadiah' : 'Laporan Kehadiran Jemaat');
-                
+                const isPrizeView = state.dataViewMode === 'prizes';
+
+                const dataToShow = isPrizeView ? state.prizeClaims : (isDrawView ? state.drawWinners : (isGiftView ? state.gifts : state.attendance));
+                const headerText = isPrizeView ? 'Laporan Pengambilan Door Prize' : (isDrawView ? 'Laporan Pemenang Undian' : (isGiftView ? 'Laporan Pengambilan Hadiah' : 'Laporan Kehadiran Jemaat'));
+                const btnPrizeClass = isPrizeView ? 'bg-fuchsia-700 text-white shadow-lg' : 'bg-slate-100 text-slate-500 hover:bg-slate-200';
+
                 const btnAttendanceClass = isAttView ? 'bg-slate-800 text-white shadow-lg' : 'bg-slate-100 text-slate-500 hover:bg-slate-200';
                 const btnGiftClass = isGiftView ? 'bg-red-600 text-white shadow-lg' : 'bg-slate-100 text-slate-500 hover:bg-slate-200';
                 const btnDrawClass = isDrawView ? 'bg-purple-600 text-white shadow-lg' : 'bg-slate-100 text-slate-500 hover:bg-slate-200';
@@ -2540,12 +2637,13 @@
                             <button onclick="window.switchDataView('attendance')" class="flex-1 py-3 text-xs font-bold rounded-xl transition-all ${btnAttendanceClass}">📋 Hadir</button>
                             <button onclick="window.switchDataView('gifts')" class="flex-1 py-3 text-xs font-bold rounded-xl transition-all ${btnGiftClass}">🎁 Hadiah</button>
                             <button onclick="window.switchDataView('draws')" class="flex-1 py-3 text-xs font-bold rounded-xl transition-all ${btnDrawClass}">🎰 Undian</button>
+                            <button onclick="window.switchDataView('prizes')" class="flex-1 py-3 text-xs font-bold rounded-xl transition-all ${btnPrizeClass}">🏆 Prize</button>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 mb-5">
                             <button onclick="window.exportData('p')" class="w-full h-full py-3 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-bold hover:bg-indigo-100 transition-colors flex justify-center items-center gap-2">
                                 📥 Download Data Master
                             </button>
-                            <div class="grid grid-cols-3 gap-2">
+                            <div class="grid grid-cols-4 gap-2">
                                 <button onclick="window.exportData('a')" class="py-3 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl text-[10px] font-bold hover:bg-emerald-100 transition-colors text-center">
                                     📥 Absen
                                 </button>
@@ -2554,6 +2652,9 @@
                                 </button>
                                 <button onclick="window.exportData('d')" class="py-3 bg-purple-50 text-purple-700 border border-purple-200 rounded-xl text-[10px] font-bold hover:bg-purple-100 transition-colors text-center">
                                     📥 Undian
+                                </button>
+                                <button onclick="window.exportData('pz')" class="py-3 bg-fuchsia-50 text-fuchsia-700 border border-fuchsia-200 rounded-xl text-[10px] font-bold hover:bg-fuchsia-100 transition-colors text-center">
+                                    📥 Prize
                                 </button>
                             </div>
                         </div>
@@ -2565,15 +2666,15 @@
                     <div class="flex justify-between items-end px-2 mb-3 mt-4 max-w-5xl mx-auto w-full">
                         <div><h3 class="font-bold text-slate-800 text-base">${headerText}</h3></div>
                         <div class="flex items-center gap-2">
-                            ${!isDrawView ? `<button onclick="window.openPeopleBoard('${isGiftView ? 'gifts' : 'attendance'}')" class="text-[10px] font-bold ${isGiftView ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-700'} text-white px-3 py-1.5 rounded-full shadow-md transition-colors">✨ Tampilan Penuh</button>` : ''}
+                            ${!isDrawView && !isPrizeView ? `<button onclick="window.openPeopleBoard('${isGiftView ? 'gifts' : 'attendance'}')" class="text-[10px] font-bold ${isGiftView ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-700'} text-white px-3 py-1.5 rounded-full shadow-md transition-colors">✨ Tampilan Penuh</button>` : ''}
                             <span class="text-[10px] font-bold bg-slate-200 text-slate-700 px-3 py-1 rounded-full shadow-inner">${dataToShow.length} Data</span>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pb-8 max-w-5xl mx-auto w-full">
                         ${dataToShow.length === 0 ? `<div class="text-center py-12 bg-white rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 md:col-span-full"><div class="text-4xl mb-3 opacity-50">📭</div><div class="text-sm font-medium">Belum ada data terekam</div></div>` : ''}
-                        ${!isDrawView ? dataToShow.map((item, i) => [item, i + 1]).reverse().map(([item, no]) => window.personCardHTML(item, no, isGiftView ? 'gifts' : 'attendance', false)).join('') : ''}
-                        ${!isDrawView ? '' : dataToShow.slice().reverse().map(item => `
+                        ${!isDrawView && !isPrizeView ? dataToShow.map((item, i) => [item, i + 1]).reverse().map(([item, no]) => window.personCardHTML(item, no, isGiftView ? 'gifts' : 'attendance', false)).join('') : ''}
+                        ${!isDrawView && !isPrizeView ? '' : dataToShow.slice().reverse().map(item => `
                             <div class="bg-white p-4 rounded-2xl shadow-sm flex items-center justify-between border border-slate-100 hover:shadow-md transition-all">
                                 <div class="min-w-0 pr-2">
                                     <div class="font-bold text-slate-800 text-sm mb-1 truncate">${item.name}</div>
@@ -2581,16 +2682,17 @@
                                         ${item.category ? `<span class="bg-amber-50 text-amber-600 border border-amber-100 px-1.5 py-0.5 rounded-md font-semibold">${item.category}</span>` : ''}
                                         <span class="bg-slate-100 px-1.5 py-0.5 rounded-md font-semibold">${item.classGrade}</span>
                                         <span class="bg-slate-100 px-1.5 py-0.5 rounded-md font-semibold">${item.sector}</span>
-                                        ${isDrawView ? `<span class="bg-purple-50 text-purple-600 border border-purple-100 px-1.5 py-0.5 rounded-md font-semibold font-mono">PIN: ${item.pin}</span>` : ''}
+                                        ${isDrawView || isPrizeView ? `<span class="bg-purple-50 text-purple-600 border border-purple-100 px-1.5 py-0.5 rounded-md font-semibold font-mono">PIN: ${item.pin || '-'}</span>` : ''}
                                     </div>
-                                    <div class="text-[10px] text-slate-400 mt-2 font-mono flex items-center gap-1 font-medium truncate">🕒 Jam ${isDrawView ? 'Menang' : (isGiftView ? 'Klaim' : 'Check-in')}: ${item.timestamp}</div>
+                                    <div class="text-[10px] text-slate-400 mt-2 font-mono flex items-center gap-1 font-medium truncate">🕒 Jam ${isPrizeView ? 'Ambil' : (isDrawView ? 'Menang' : (isGiftView ? 'Klaim' : 'Check-in'))}: ${item.timestamp}</div>
+                                    ${isDrawView ? (prizeClaimOf(item.participantId) ? `<div class="text-[10px] text-emerald-600 mt-1 font-bold">✓ Prize sudah diambil</div>` : `<div class="text-[10px] text-amber-600 mt-1 font-bold">⏳ Prize belum diambil</div>`) : ''}
                                 </div>
-                                <div class="${isDrawView ? 'bg-purple-50 text-purple-600 border-purple-100' : (isGiftView ? 'bg-red-50 text-red-600 border-red-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100')} px-2.5 py-1.5 rounded-lg text-[10px] font-bold border flex items-center gap-1 shadow-sm shrink-0">
-                                    <span class="hidden md:inline">✓</span> ${isDrawView ? 'MENANG' : (isGiftView ? 'DIAMBIL' : 'HADIR')}
+                                <div class="${isPrizeView ? 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-100' : (isDrawView ? 'bg-purple-50 text-purple-600 border-purple-100' : (isGiftView ? 'bg-red-50 text-red-600 border-red-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'))} px-2.5 py-1.5 rounded-lg text-[10px] font-bold border flex items-center gap-1 shadow-sm shrink-0">
+                                    <span class="hidden md:inline">✓</span> ${isPrizeView ? 'DIAMBIL' : (isDrawView ? 'MENANG' : (isGiftView ? 'DIAMBIL' : 'HADIR'))}
                                 </div>
                             </div>
                         `).join('')}
-                        
+
                         <div class="mt-8 text-center pb-8 md:col-span-full w-full flex flex-wrap justify-center gap-2">
                             <button onclick="window.setTab('backup')" class="text-[10px] text-sky-700 font-bold border border-sky-200 bg-sky-50 px-4 py-2 rounded-full hover:bg-sky-100 transition-colors">
                                 🛡️ Backup & Pemulihan
@@ -2613,14 +2715,14 @@
             document.getElementById('ticCategory').innerText = cat || "-";
             document.getElementById('ticClass').innerText = c || "-";
             document.getElementById('ticSector').innerText = s || "-";
-            
+
             const pinStr = q.slice(-4);
             const pinEl = document.getElementById('ticPin');
             if(pinEl) pinEl.innerText = pinStr;
 
             const qrUrl = getQR(q);
             const imgEl = document.getElementById('ticQR');
-            imgEl.src = qrUrl; 
+            imgEl.src = qrUrl;
 
             fetch(qrUrl)
                 .then(res => res.blob())
@@ -2630,22 +2732,22 @@
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         canvas.width = 600;
-                        canvas.height = 740; 
+                        canvas.height = 740;
                         const ctx = canvas.getContext('2d');
-                        
+
                         ctx.fillStyle = '#ffffff';
                         ctx.fillRect(0, 0, canvas.width, canvas.height);
                         ctx.drawImage(img, 0, 0, 600, 600);
-                        
+
                         ctx.fillStyle = '#0f172a';
                         ctx.font = 'bold 60px monospace';
                         ctx.textAlign = 'center';
                         ctx.fillText(`PIN: ${pinStr}`, 300, 660);
-                        
+
                         ctx.fillStyle = '#64748b';
                         ctx.font = 'bold 30px sans-serif';
                         ctx.fillText((n || '').toUpperCase(), 300, 710, 560);
-                        
+
                         imgEl.src = canvas.toDataURL('image/png');
                         URL.revokeObjectURL(blobUrl);
                     };
@@ -2655,23 +2757,23 @@
 
             const t = document.getElementById('ticketModal');
             t.classList.remove('hidden');
-            setTimeout(() => { 
-                t.style.opacity = '1'; 
+            setTimeout(() => {
+                t.style.opacity = '1';
                 const scaleContainer = t.querySelector('.transform.scale-95') || t.querySelector('.transform.scale-100');
-                if(scaleContainer) scaleContainer.classList.replace('scale-95', 'scale-100'); 
+                if(scaleContainer) scaleContainer.classList.replace('scale-95', 'scale-100');
             }, 10);
         };
-        
+
         window.downloadBarcode = async () => {
             const qrUrl = document.getElementById('ticQR').src;
             const pName = document.getElementById('ticName').innerText.replace(/\s+/g, '_');
             const filename = `Tiket_Natal_2026_${pName}.png`;
-            
+
             try {
                 const response = await fetch(qrUrl);
                 const blob = await response.blob();
                 const blobUrl = URL.createObjectURL(blob);
-                
+
                 const link = document.createElement('a');
                 link.href = blobUrl;
                 link.download = filename;
@@ -2692,7 +2794,7 @@
 
         window.printTicket = () => {
             const printWindow = window.open('', '_blank');
-            const pin = document.getElementById('ticPin').innerText; 
+            const pin = document.getElementById('ticPin').innerText;
             printWindow.document.write(`
                 <html><head><title>Tiket Natal 2026</title>
                 <style>
@@ -2767,15 +2869,22 @@
                 csv += "Nama,Kelas,Sektor,PIN,Waktu_Menang\n";
                 data = state.drawWinners; filename = "Laporan_Undian_Natal_2026.csv";
                 data.forEach(x => { csv += `"${x.name}","${x.classGrade || '-'}","${x.sector || '-'}","${x.pin || '-'}","${x.timestamp}"\n`; });
+            } else if (type === 'pz') {
+                csv += "Nama,Kelas,Sektor,PIN,Waktu_Menang,Status,Waktu_Ambil_Prize,Petugas\n";
+                data = state.drawWinners; filename = "Laporan_Ambil_DoorPrize_Natal_2026.csv";
+                data.forEach(x => {
+                    const c = prizeClaimOf(x.participantId);
+                    csv += `"${x.name}","${x.classGrade || '-'}","${x.sector || '-'}","${x.pin || '-'}","${x.timestamp}","${c ? 'Sudah Diambil' : 'Belum Diambil'}","${c ? c.timestamp : '-'}","${c && c.by ? c.by : '-'}"\n`;
+                });
             }
-            
+
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob); link.download = filename;
             document.body.appendChild(link); link.click(); document.body.removeChild(link);
         };
 
-        window.importData = (input) => { 
+        window.importData = (input) => {
              const f = input.files[0]; if(!f) return;
              const r = new FileReader();
              r.onload = e => {
@@ -2793,12 +2902,12 @@
                          c++;
                      }
                  });
-                 alert(`Berhasil import ${c} data!`); 
+                 alert(`Berhasil import ${c} data!`);
                  input.value = '';
              };
              r.readAsText(f);
         };
-        
+
         window.triggerImport = () => {
             if (!isAdmin()) {
                 window.requireAdmin(() => {
@@ -2826,7 +2935,8 @@
                 db.ref('participants').set(null),
                 db.ref('attendance').set(null),
                 db.ref('gifts').set(null),
-                db.ref('drawWinners').set(null)
+                db.ref('drawWinners').set(null),
+                db.ref('prizeClaims').set(null)
             ]).then(() => alert("Database berhasil di-reset ke kondisi kosong.\n\n🛡️ Data sebelum dihapus tersimpan di menu Backup."))
               .catch(handleWriteError);
         };
