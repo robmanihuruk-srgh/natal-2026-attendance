@@ -664,6 +664,7 @@
                 if (el) el.classList.toggle('hidden', !isAdmin());
             });
             if (isAdmin()) startBackupWatch(); else stopBackupWatch();
+            if (prevKey !== userKey(state.user) && window.subscribePrizeClaims) window.subscribePrizeClaims();
 
             if (isAdmin() && !usersRef) {
                 usersRef = db.ref('users');
@@ -1700,12 +1701,32 @@
             if (state.tab === 'prize') window.refreshManualList();
         });
 
-        db.ref('prizeClaims').on('value', s => {
-            state.prizeClaims = s.val() ? Object.values(s.val()) : [];
+        // Data pengambilan door prize. Jika pembacaan ditolak (mis. Rules belum ada / belum login),
+        // listener Firebase otomatis berhenti -> dipasang ulang saat login berubah & dicoba lagi berkala.
+        state.prizeClaimsError = '';
+        let prizeClaimsRef = null, prizeClaimsRetry = null;
+        const refreshPrizeUI = () => {
             if (state.tab === 'draw') window.renderDrawWinners();
             if (state.tab === 'data' && state.dataViewMode === 'prizes') window.render();
-            if (state.tab === 'prize') window.refreshManualList();
-        }, err => console.warn('Data pengambilan door prize tidak terbaca', err));
+            if (state.tab === 'prize') { window.refreshManualList(); window.refreshPrizeBanner(); }
+        };
+        window.subscribePrizeClaims = () => {
+            if (prizeClaimsRef) prizeClaimsRef.off();
+            if (prizeClaimsRetry) { clearTimeout(prizeClaimsRetry); prizeClaimsRetry = null; }
+            prizeClaimsRef = db.ref('prizeClaims');
+            prizeClaimsRef.on('value', s => {
+                state.prizeClaims = s.val() ? Object.values(s.val()) : [];
+                state.prizeClaimsError = '';
+                refreshPrizeUI();
+            }, err => {
+                console.warn('Data pengambilan door prize tidak terbaca', err);
+                prizeClaimsRef = null;
+                state.prizeClaimsError = '⛔ Data pengambilan door prize tidak bisa dibaca dari server (' + ((err && (err.code || err.message)) || 'permission_denied') + '). Tambahkan aturan "prizeClaims" di Firebase Database Rules lalu Publish.';
+                refreshPrizeUI();
+                prizeClaimsRetry = setTimeout(window.subscribePrizeClaims, 15000);
+            });
+        };
+        window.subscribePrizeClaims();
 
         function updateStats() {
             document.getElementById('statRegistered').innerText = state.participants.length;
@@ -1854,15 +1875,34 @@
                 beep('fail'); window.showScanResult(false, `⚠️ ${escHTML(p.name)} Sudah Ambil Door Prize!<br><span class="text-xs font-normal opacity-90 mt-1 block">Diambil jam ${escHTML(getTimeStr(claimed.timestamp))} WIB</span>`, 'bg-amber-500');
                 return;
             }
-            beep('success');
             const ts = fmtDate();
-            db.ref('prizeClaims').push({
+            // Struktur data sama persis dengan node "gifts" agar aturan Rules-nya bisa disalin apa adanya
+            const rec = {
                 id: Date.now().toString(), participantId: p.id, name: p.name,
-                category: p.category || '', classGrade: p.classGrade || '-', sector: p.sector || '-',
-                pin: win.pin || '', wonAt: win.timestamp || '', timestamp: ts,
-                by: state.user ? state.user.email : ''
-            }).catch(handleWriteError);
+                category: p.category || '', classGrade: p.classGrade, sector: p.sector, timestamp: ts
+            };
+            const newRef = db.ref('prizeClaims').push();
+            // Catat langsung di perangkat ini supaya status & hitungan "diambil" langsung bertambah
+            state.prizeClaims = state.prizeClaims.concat([rec]);
+            refreshPrizeUI();
+            beep('success');
             window.showScanResult(true, `🏆 ${escHTML(p.name)} Ambil Door Prize!<br><span class="text-xs font-normal opacity-90 mt-1 block">Jam Ambil: ${getTimeStr(ts)} WIB</span>`, 'bg-purple-600');
+            newRef.set(rec).catch(e => {
+                // Ditolak server -> batalkan catatan lokal & beri tahu petugas
+                state.prizeClaims = state.prizeClaims.filter(c => c !== rec);
+                refreshPrizeUI();
+                beep('fail');
+                window.showScanResult(false, `⛔ GAGAL tersimpan: ${escHTML(p.name)}<br><span class="text-xs font-normal opacity-90 mt-1 block">Ditolak server. Periksa aturan "prizeClaims" di Database Rules.</span>`);
+                handleWriteError(e);
+            });
+        };
+
+        // Peringatan di tab Ambil Prize bila data tidak bisa dibaca dari server
+        window.refreshPrizeBanner = () => {
+            const el = document.getElementById('pzError');
+            if (!el) return;
+            el.innerText = state.prizeClaimsError || '';
+            el.classList.toggle('hidden', !state.prizeClaimsError);
         };
 
         window.doCheckIn = (p) => {
@@ -2377,6 +2417,7 @@
                             </div>
                             <h3 class="font-bold text-lg text-slate-800">${label}</h3>
                         </div>
+                        ${isPrize ? `<div id="pzError" class="${state.prizeClaimsError ? '' : 'hidden'} text-xs font-bold text-red-700 bg-red-50 border border-red-200 rounded-xl px-3 py-2.5 mb-3 text-left">${escHTML(state.prizeClaimsError)}</div>` : ''}
                         ${isPrize ? `<div id="pzCounter" class="flex flex-wrap justify-center gap-2 mb-4 text-[11px] font-bold">${prizeCounterHTML()}</div>` : ''}
 
                         <div id="scanRes" class="hidden"></div>
@@ -2682,7 +2723,7 @@
                                         ${item.category ? `<span class="bg-amber-50 text-amber-600 border border-amber-100 px-1.5 py-0.5 rounded-md font-semibold">${item.category}</span>` : ''}
                                         <span class="bg-slate-100 px-1.5 py-0.5 rounded-md font-semibold">${item.classGrade}</span>
                                         <span class="bg-slate-100 px-1.5 py-0.5 rounded-md font-semibold">${item.sector}</span>
-                                        ${isDrawView || isPrizeView ? `<span class="bg-purple-50 text-purple-600 border border-purple-100 px-1.5 py-0.5 rounded-md font-semibold font-mono">PIN: ${item.pin || '-'}</span>` : ''}
+                                        ${isDrawView || isPrizeView ? `<span class="bg-purple-50 text-purple-600 border border-purple-100 px-1.5 py-0.5 rounded-md font-semibold font-mono">PIN: ${item.pin || (drawWinnerOf(item.participantId) || {}).pin || '-'}</span>` : ''}
                                     </div>
                                     <div class="text-[10px] text-slate-400 mt-2 font-mono flex items-center gap-1 font-medium truncate">🕒 Jam ${isPrizeView ? 'Ambil' : (isDrawView ? 'Menang' : (isGiftView ? 'Klaim' : 'Check-in'))}: ${item.timestamp}</div>
                                     ${isDrawView ? (prizeClaimOf(item.participantId) ? `<div class="text-[10px] text-emerald-600 mt-1 font-bold">✓ Prize sudah diambil</div>` : `<div class="text-[10px] text-amber-600 mt-1 font-bold">⏳ Prize belum diambil</div>`) : ''}
@@ -2870,11 +2911,11 @@
                 data = state.drawWinners; filename = "Laporan_Undian_Natal_2026.csv";
                 data.forEach(x => { csv += `"${x.name}","${x.classGrade || '-'}","${x.sector || '-'}","${x.pin || '-'}","${x.timestamp}"\n`; });
             } else if (type === 'pz') {
-                csv += "Nama,Kelas,Sektor,PIN,Waktu_Menang,Status,Waktu_Ambil_Prize,Petugas\n";
+                csv += "Nama,Kelas,Sektor,PIN,Waktu_Menang,Status,Waktu_Ambil_Prize\n";
                 data = state.drawWinners; filename = "Laporan_Ambil_DoorPrize_Natal_2026.csv";
                 data.forEach(x => {
                     const c = prizeClaimOf(x.participantId);
-                    csv += `"${x.name}","${x.classGrade || '-'}","${x.sector || '-'}","${x.pin || '-'}","${x.timestamp}","${c ? 'Sudah Diambil' : 'Belum Diambil'}","${c ? c.timestamp : '-'}","${c && c.by ? c.by : '-'}"\n`;
+                    csv += `"${x.name}","${x.classGrade || '-'}","${x.sector || '-'}","${x.pin || '-'}","${x.timestamp}","${c ? 'Sudah Diambil' : 'Belum Diambil'}","${c ? c.timestamp : '-'}"\n`;
                 });
             }
 
