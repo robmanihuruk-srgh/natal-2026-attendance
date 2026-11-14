@@ -4883,7 +4883,9 @@ var qrcode = function() {
                 const cell = Math.max(4, Math.floor(600 / (n + 4)));
                 return q.createDataURL(cell, cell * 2);
             } catch (e) {
-                return `https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=15&ecc=M&color=0f172a&bgcolor=ffffff&format=png&data=${encodeURIComponent(txt)}`;
+                // Tidak pernah mengirim kode tiket ke layanan luar: tampilkan pesan bila gagal
+                console.error('QR gagal dibuat', e);
+                return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600"><rect width="600" height="600" fill="#fff"/><text x="300" y="290" font-size="34" text-anchor="middle" font-family="sans-serif" fill="#b91c1c">QR gagal dibuat</text><text x="300" y="340" font-size="26" text-anchor="middle" font-family="sans-serif" fill="#475569">Muat ulang halaman</text></svg>');
             }
         };
         const getTimeStr = (ts) => { if(!ts) return ''; const m = ts.match(/(\d{1,2}[:.]\d{2})/); return m ? m[1].replace('.',':') : ''; };
