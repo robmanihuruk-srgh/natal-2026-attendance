@@ -4898,6 +4898,7 @@ var qrcode = function() {
             }
 
             container.innerHTML = `
+                ${drawConflictHTML()}
                 <h4 class="font-bold text-slate-700 mb-3 text-left text-sm flex flex-wrap items-center justify-center md:justify-start gap-2 w-full">
                     <span class="text-purple-600 text-lg">🏆</span> <span class="whitespace-nowrap">Riwayat Pemenang</span>
                     <span class="text-[10px] font-bold bg-purple-50 text-purple-600 border border-purple-100 px-2 py-0.5 rounded-md">${activeWinners().length}</span>
@@ -5895,14 +5896,14 @@ var qrcode = function() {
         const SANTA_SVG = `<svg viewBox="0 0 170 170" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g class="santa-idle"><g class="santa-sack"><path d="M14 132 C10 104 22 88 40 86 C58 88 70 104 66 132 C64 150 16 150 14 132 Z" fill="#a16207"/><path d="M22 122 C24 108 30 100 38 98" stroke="#ca8a04" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="28" y="74" width="13" height="13" rx="2" fill="#16a34a"/><rect x="33" y="74" width="3" height="13" fill="#facc15"/><rect x="40" y="70" width="12" height="15" rx="2" fill="#2563eb" transform="rotate(14 46 78)"/><path d="M30 88 Q40 82 52 88" stroke="#713f12" stroke-width="5" fill="none" stroke-linecap="round"/></g><ellipse cx="80" cy="164" rx="13" ry="6" fill="#111827"/><ellipse cx="114" cy="164" rx="13" ry="6" fill="#111827"/><ellipse cx="97" cy="124" rx="40" ry="38" fill="#dc2626"/><path d="M62 112 Q97 96 132 112" fill="none" stroke="#b91c1c" stroke-width="3" opacity=".5"/><rect x="93" y="90" width="8" height="58" rx="4" fill="#f8fafc"/><rect x="57" y="120" width="80" height="11" rx="3" fill="#1f2937"/><rect x="88" y="117" width="18" height="17" rx="3" fill="none" stroke="#facc15" stroke-width="3.5"/><rect x="56" y="148" width="82" height="11" rx="5.5" fill="#f8fafc"/><g class="santa-arm-l"><rect x="44" y="99" width="30" height="14" rx="7" fill="#dc2626"/><rect x="47" y="98" width="6" height="16" rx="3" fill="#f8fafc"/><circle cx="44" cy="106" r="8" fill="#1f2937"/></g><g class="santa-arm-r"><rect x="124" y="66" width="14" height="40" rx="7" fill="#dc2626"/><rect x="123" y="66" width="16" height="7" rx="3.5" fill="#f8fafc"/><circle cx="131" cy="61" r="8" fill="#1f2937"/></g><circle cx="97" cy="66" r="24" fill="#fcd9b8"/><circle cx="83" cy="70" r="5" fill="#fca5a5" opacity=".7"/><circle cx="111" cy="70" r="5" fill="#fca5a5" opacity=".7"/><g fill="#f8fafc"><circle cx="78" cy="80" r="12"/><circle cx="97" cy="88" r="15"/><circle cx="116" cy="80" r="12"/><circle cx="86" cy="96" r="10"/><circle cx="108" cy="96" r="10"/><circle cx="97" cy="102" r="8"/></g><ellipse cx="89" cy="77" rx="9" ry="4.5" fill="#e2e8f0"/><ellipse cx="105" cy="77" rx="9" ry="4.5" fill="#e2e8f0"/><circle cx="97" cy="72" r="4.5" fill="#f87171"/><ellipse cx="89" cy="62" rx="2.6" ry="3.2" fill="#1f2937"/><ellipse cx="105" cy="62" rx="2.6" ry="3.2" fill="#1f2937"/><path d="M84 55 Q89 52 93 55 M101 55 Q105 52 110 55" stroke="#e2e8f0" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M72 50 Q90 14 126 26 Q134 30 132 40 L120 50 Z" fill="#dc2626"/><circle cx="134" cy="40" r="7.5" fill="#f8fafc"/><rect x="70" y="44" width="54" height="12" rx="6" fill="#f8fafc"/></g></svg>`;
         const drawRestartAnim = (el, cls) => { el.classList.remove('name-roll', 'name-win'); void el.offsetWidth; el.classList.add(cls); };
 
-        window.spinDoorPrize = () => {
-            if (!can('draw')) { window.requirePerm('draw', () => {}, 'Undian Door Prize'); return; }
+        const spinRun = () => {
+            if (!can('draw')) { window.requirePerm('draw', () => {}, 'Undian Door Prize'); return false; }
             const selectedClass = document.getElementById('drawClass').value;
             const selOpt = drawOptByValue(selectedClass);
             if (!selOpt || !drawClassEnabled(selOpt.key)) {
                 alert('⛔ Pilihan kelas ini sedang dinonaktifkan.\nPilih kelas lain, atau minta admin mengaktifkannya.');
                 window.refreshDrawClassUI();
-                return;
+                return false;
             }
 
             // Hadiah yang diundi (bila daftar hadiah sudah dibuat)
@@ -5913,7 +5914,7 @@ var qrcode = function() {
                 if (!drawPrize || prizeLeft(drawPrize) <= 0) {
                     alert('🎁 Semua hadiah di daftar sudah habis diundi, atau belum ada hadiah yang dipilih.\nTambah hadiah / jumlahnya lewat "Kelola Daftar Hadiah".');
                     window.refreshPrizePanel();
-                    return;
+                    return false;
                 }
                 state.drawPrizeId = drawPrize.id;
             }
@@ -5926,7 +5927,7 @@ var qrcode = function() {
 
             if (pool.length === 0) {
                 alert(`❌ Belum ada peserta yang memenuhi syarat untuk kelas: ${selectedClass}\n(Atau semua peserta yang hadir di kelas ini sudah memenangkan hadiah)`);
-                return;
+                return false;
             }
 
             const drawBox = document.getElementById('drawBox');
@@ -6010,6 +6011,7 @@ var qrcode = function() {
 
                     state.drawSpinning = false;
                     pjLive({ state: 'idle', winnerKey: winKey, at: Date.now() });
+                    releaseDrawLock();
                     state.drawShownKey = winKey; state.drawShownAt = Date.now(); drawTimerBeeped = false;
                     window.updateDrawActions();
                     window.refreshPrizePanel();
@@ -6019,6 +6021,131 @@ var qrcode = function() {
                 }
             };
             tick();
+            return true;
+        };
+
+        // ===================== KUNCI UNDIAN (cegah 2 perangkat mengundi bersamaan) =====================
+        //   /live/lock -> { device, by, name, at } — diambil lewat transaksi Firebase sebelum mengacak,
+        //   dilepas setelah pemenang tersimpan. Kedaluwarsa otomatis 30 detik / saat perangkat terputus.
+        const DRAW_LOCK_TTL = 30000;
+        const DEVICE_ID = (() => {
+            let id = LS_get('natal2026.deviceId', null);
+            if (!id) { id = 'dev-' + Math.random().toString(36).slice(2, 10); LS_set('natal2026.deviceId', id); }
+            return id;
+        })();
+        state.serverOffset = 0; state.drawLock = null; state.drawLocking = false; state.offlineDrawOk = false;
+        db.ref('.info/serverTimeOffset').on('value', s => { state.serverOffset = s.val() || 0; }, () => {});
+        const serverNow = () => Date.now() + (state.serverOffset || 0);
+        const lockHeldByOther = (l) => !!(l && l.device && l.device !== DEVICE_ID && serverNow() - (l.at || 0) < DRAW_LOCK_TTL);
+
+        const withTimeout = (pr, ms) => Promise.race([pr, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
+
+        const acquireDrawLock = async () => {
+            if (!state.online) {
+                if (!state.offlineDrawOk) {
+                    if (!confirm('📴 Anda sedang OFFLINE.\n\nSaat offline, aplikasi tidak bisa memastikan tidak ada perangkat lain yang sedang mengundi.\nPastikan HANYA perangkat ini yang dipakai untuk undian.\n\nLanjutkan mengundi?')) return false;
+                    state.offlineDrawOk = true;
+                }
+                return true;
+            }
+            const me = { device: DEVICE_ID, by: state.user ? state.user.email : '', name: state.user ? (state.user.name || state.user.email) : '' };
+            try {
+                const res = await withTimeout(db.ref('live/lock').transaction(cur => {
+                    if (lockHeldByOther(cur)) return; // batalkan: perangkat lain sedang mengundi
+                    return Object.assign({}, me, { at: serverNow() });
+                }, undefined, false), 8000);
+                if (!res.committed) {
+                    const cur = (res.snapshot && res.snapshot.val()) || {};
+                    beep('fail');
+                    alert(`🔒 Undian sedang dijalankan oleh ${cur.name || cur.by || 'petugas lain'} di perangkat lain.\n\nTunggu sampai selesai, lalu coba lagi.`);
+                    return false;
+                }
+                try { db.ref('live/lock').onDisconnect().remove(); } catch (e) {}
+                return true;
+            } catch (e) {
+                if (/permission/i.test((e && (e.code || e.message)) || '')) { alert('⛔ Ditolak server saat mengunci undian. Pastikan Database Rules terbaru sudah di-Publish.'); return false; }
+                alert('⚠️ Gagal mengunci undian (koneksi lambat). Coba tekan Acak lagi.');
+                return false;
+            }
+        };
+        const releaseDrawLock = () => {
+            if (!state.online) return;
+            const r = db.ref('live/lock');
+            r.transaction(cur => (cur && cur.device === DEVICE_ID) ? null : undefined, undefined, false).catch(() => {});
+            try { r.onDisconnect().cancel(); } catch (e) {}
+        };
+
+        // Ambil data undian terbaru dari server sebelum mengacak (pemenang dari perangkat lain ikut dihitung)
+        const refreshDrawData = async () => {
+            for (const n of ['drawWinners', 'drawForfeits', 'prizes']) {
+                try { const sn = await withTimeout(db.ref(n).once('value'), 6000); applyNode(n, sn.val(), true); } catch (e) {}
+            }
+        };
+
+        window.spinDoorPrize = async () => {
+            if (!can('draw')) { window.requirePerm('draw', () => {}, 'Undian Door Prize'); return; }
+            if (state.drawSpinning || state.drawLocking) return;
+            if (lockHeldByOther(state.drawLock)) {
+                alert(`🔒 Undian sedang dijalankan oleh ${state.drawLock.name || state.drawLock.by || 'petugas lain'} di perangkat lain.\n\nTunggu sampai selesai.`);
+                return;
+            }
+            state.drawLocking = true;
+            const btn = document.getElementById('btnDraw');
+            const oldTxt = btn ? btn.innerHTML : '';
+            if (btn) { btn.disabled = true; btn.innerHTML = '🔒 Menyiapkan undian...'; }
+            let started = false;
+            try {
+                if (!(await acquireDrawLock())) return;
+                if (state.online) await refreshDrawData();
+                started = spinRun();
+                if (!started) releaseDrawLock();
+            } finally {
+                state.drawLocking = false;
+                const b2 = document.getElementById('btnDraw');
+                if (b2 && !state.drawSpinning) { b2.disabled = false; b2.innerHTML = oldTxt || '🎲 Acak Pemenang Sekarang'; }
+                window.updateDrawLockUI();
+            }
+        };
+
+        // Tampilan saat perangkat lain sedang mengundi
+        let drawLockTimer = null;
+        window.updateDrawLockUI = () => {
+            const btn = document.getElementById('btnDraw');
+            const note = document.getElementById('drawLockNote');
+            const other = lockHeldByOther(state.drawLock);
+            if (note) {
+                note.classList.toggle('hidden', !other);
+                if (other) note.innerHTML = `🔒 Sedang diundi oleh <b>${escHTML(state.drawLock.name || state.drawLock.by || 'petugas lain')}</b> di perangkat lain...`;
+            }
+            if (btn && !state.drawSpinning && !state.drawLocking) {
+                btn.disabled = other;
+                btn.classList.toggle('opacity-50', other);
+                btn.classList.toggle('cursor-not-allowed', other);
+            }
+            clearTimeout(drawLockTimer);
+            if (other) drawLockTimer = setTimeout(window.updateDrawLockUI, Math.max(500, DRAW_LOCK_TTL - (serverNow() - (state.drawLock.at || 0)) + 200));
+        };
+        db.ref('live/lock').on('value', s => { state.drawLock = s.val(); window.updateDrawLockUI(); }, () => {});
+
+        // Deteksi bila tetap terjadi undian ganda (mis. dua perangkat sama-sama offline)
+        const drawConflicts = () => {
+            const act = activeWinners();
+            const byPid = {};
+            act.forEach(w => { (byPid[w.participantId] = byPid[w.participantId] || []).push(w); });
+            const dupPeople = Object.values(byPid).filter(l => l.length > 1);
+            const overPrizes = state.prizes.filter(x => prizeWinners(x.id).length > (parseInt(x.qty, 10) || 0));
+            return { dupPeople, overPrizes };
+        };
+        const drawConflictHTML = () => {
+            const { dupPeople, overPrizes } = drawConflicts();
+            if (!dupPeople.length && !overPrizes.length) return '';
+            const items = [];
+            dupPeople.forEach(l => items.push(`<b>${escHTML(l[0].name)}</b> terpilih ${l.length}x`));
+            overPrizes.forEach(x => items.push(`hadiah <b>${escHTML(x.name)}</b> dimenangkan ${prizeWinners(x.id).length} orang (jumlah ${parseInt(x.qty, 10) || 0})`));
+            return `<div class="mb-3 text-left text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
+                ⚠️ <b>Terdeteksi undian ganda</b> (kemungkinan dua perangkat mengundi saat offline): ${items.join('; ')}.
+                <div class="mt-1 text-[11px] text-red-600">Tentukan pemenang yang berlaku, lalu tekan <b>❌ Hangus</b> pada catatan yang tidak berlaku di daftar di bawah.</div>
+            </div>`;
         };
 
         window.render = () => {
@@ -6223,6 +6350,7 @@ var qrcode = function() {
                                 <div id="drawActions" class="relative z-10 mt-4 hidden"></div>
                             </div>
 
+                            <div id="drawLockNote" class="hidden mb-3 text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 animate-pulse"></div>
                             <button id="btnDraw" onclick="window.spinDoorPrize()" class="w-full py-4 bg-purple-600 text-white font-bold rounded-2xl shadow-lg shadow-purple-200 hover:bg-purple-700 active:scale-95 transition-all flex justify-center items-center gap-2">
                                 🎲 Acak Pemenang Sekarang
                             </button>
@@ -6233,7 +6361,7 @@ var qrcode = function() {
                         </div>
                     </div>
                 `;
-                setTimeout(() => { window.renderDrawWinners(); }, 50);
+                setTimeout(() => { window.renderDrawWinners(); window.updateDrawLockUI(); }, 50);
             } else if (state.tab === 'backup') {
                 if (!isAdmin()) {
                     root.innerHTML = `<div class="text-center py-12 bg-white rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 max-w-3xl mx-auto w-full">🔒 Menu ini khusus admin.</div>`;

@@ -3,7 +3,7 @@
  * tetap bisa dibuka walau internet putus. Data acara disinkronkan oleh aplikasi sendiri.
  * Naikkan nomor VERSI setiap kali index.html diganti agar semua perangkat memakai versi terbaru.
  */
-const VERSI = 'natal2026-v7';
+const VERSI = 'natal2026-v8';
 const FILE_APLIKASI = ['./', './index.html', './LOGO-GKPS-ASLI-1.png', './logo-tema-gkps.jpg'];
 
 self.addEventListener('install', (event) => {
