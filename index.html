@@ -5363,11 +5363,15 @@ var qrcode = function() {
             attendance: () => {
                 updateStats();
                 if (state.tab === 'data' && state.dataViewMode === 'attendance') window.render();
+                // Tab Absen: status di daftar Pencarian Manual langsung berubah jadi "Hadir" tanpa refresh
+                if (state.tab === 'scan' && state.searchTerm) window.refreshManualList();
                 window.refreshPeopleBoard();
             },
             gifts: () => {
                 updateStats();
                 if (state.tab === 'data' && state.dataViewMode === 'gifts') window.render();
+                // Tab Hadiah: status langsung berubah jadi "Diambil" tanpa refresh
+                if (state.tab === 'gift' && state.searchTerm) window.refreshManualList();
                 window.refreshPeopleBoard();
             },
             drawWinners: () => {
