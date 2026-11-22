@@ -2823,6 +2823,19 @@ var qrcode = function() {
         </div>
     </div>
 
+    <!-- Dialog konfirmasi (pengganti confirm() bawaan browser yang memblokir halaman / INP) -->
+    <div id="askModal" style="z-index:10050" class="fixed inset-0 bg-slate-900/60 hidden backdrop-blur-sm transition-all duration-300 opacity-0 overflow-y-auto">
+        <div class="min-h-[100dvh] flex px-4 py-12">
+            <div class="bg-white w-full max-w-md rounded-[2rem] p-6 shadow-2xl transform scale-95 transition-transform duration-300 m-auto">
+                <div id="askMsg" class="text-sm font-medium text-slate-700 whitespace-pre-line"></div>
+                <div class="flex gap-3 mt-5">
+                    <button id="askCancel" type="button" class="flex-1 py-3.5 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors">Batal</button>
+                    <button id="askOk" type="button" class="flex-1 py-3.5 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 shadow-lg transition-colors">Ya, Lanjutkan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="cancelModal" class="fixed inset-0 z-[9450] bg-slate-900/60 hidden backdrop-blur-sm transition-all duration-300 opacity-0 overflow-y-auto">
         <div class="min-h-[100dvh] flex px-4 py-12">
             <div class="bg-white w-full max-w-md rounded-[2rem] p-6 shadow-2xl transform scale-95 transition-transform duration-300 m-auto">
@@ -3085,6 +3098,26 @@ var qrcode = function() {
                 if (sc) sc.classList.replace('scale-95', 'scale-100');
             }, 10);
         };
+        // Konfirmasi tanpa memblokir halaman (pengganti confirm()). Hasil: Promise<true|false>
+        let askResolve = null;
+        const askConfirm = (msg, okText) => new Promise(resolve => {
+            if (askResolve) askResolve(false);
+            askResolve = resolve;
+            document.getElementById('askMsg').textContent = msg;
+            document.getElementById('askOk').textContent = okText || 'Ya, Lanjutkan';
+            openModalEl('askModal');
+            setTimeout(() => { const b = document.getElementById('askOk'); if (b) b.focus(); }, 50);
+        });
+        const askDone = (val) => {
+            const r = askResolve; askResolve = null;
+            window.closeModal('askModal');
+            // Beri kesempatan browser menggambar dialog tertutup dulu, baru jalankan proses berikutnya
+            if (r) setTimeout(() => r(val), 0);
+        };
+        document.getElementById('askOk').addEventListener('click', () => askDone(true));
+        document.getElementById('askCancel').addEventListener('click', () => askDone(false));
+        document.getElementById('askModal').addEventListener('click', (e) => { if (e.target === e.currentTarget || e.target === e.currentTarget.firstElementChild) askDone(false); });
+        document.addEventListener('keydown', (e) => { if (askResolve && e.key === 'Escape') askDone(false); });
         const showErr = (id, msg) => {
             const el = document.getElementById(id);
             if (!msg) { el.classList.add('hidden'); return; }
@@ -3259,9 +3292,10 @@ var qrcode = function() {
         };
 
         window.adminLogout = async () => {
-            if (!confirm('Keluar dari akun panitia?')) return;
+            if (!(await askConfirm('Keluar dari akun panitia?', '🚪 Keluar'))) return;
             window.closeModal('accountModal');
-            try { await auth.signOut(); } catch (e) { console.error(e); }
+            // Tunggu animasi modal selesai baru logout (render ulang berat dipindah keluar dari klik)
+            setTimeout(async () => { try { await auth.signOut(); } catch (e) { console.error(e); } }, 320);
         };
 
         const permChipsHTML = (u) => {
@@ -3410,7 +3444,7 @@ var qrcode = function() {
             if (!email) { showErr('umError', 'Isi email akun.'); return; }
             if (pw.length < 6) { showErr('umError', 'Password awal minimal 6 karakter.'); return; }
             if (!Object.values(perms).some(Boolean)) {
-                if (!confirm('Akun ini belum diberi hak akses apa pun. Tetap buat akun?')) return;
+                if (!await askConfirm('Akun ini belum diberi hak akses apa pun. Tetap buat akun?')) return;
             }
 
             btn.disabled = true; btn.innerText = 'Membuat akun...';
@@ -3439,7 +3473,7 @@ var qrcode = function() {
             if (!u) return;
             if (uid === state.user.uid) { alert('Anda tidak bisa menonaktifkan akun Anda sendiri.'); return; }
             const next = u.active !== true;
-            if (!confirm(`${next ? 'Aktifkan' : 'Nonaktifkan'} akun ${u.email}?${next ? '' : '\n\nAkun ini tidak bisa memakai fitur panitia sampai diaktifkan lagi.'}`)) return;
+            if (!await askConfirm(`${next ? 'Aktifkan' : 'Nonaktifkan'} akun ${u.email}?${next ? '' : '\n\nAkun ini tidak bisa memakai fitur panitia sampai diaktifkan lagi.'}`)) return;
             try { await db.ref('users/' + uid).update({ active: next, updatedAt: Date.now(), updatedBy: state.user.email }); }
             catch (e) { alert(authErrMsg(e)); }
         };
@@ -3449,7 +3483,7 @@ var qrcode = function() {
             if (!isAdmin()) return;
             const u = state.users.find(x => x.uid === uid);
             if (!u || !u.email) return;
-            if (!confirm(`Kirim link reset password ke ${u.email}?\n\nPemilik akun akan menerima email berisi link untuk membuat password baru.`)) return;
+            if (!await askConfirm(`Kirim link reset password ke ${u.email}?\n\nPemilik akun akan menerima email berisi link untuk membuat password baru.`)) return;
             try {
                 await auth.sendPasswordResetEmail(u.email);
                 alert(`📧 Link reset password sudah dikirim ke ${u.email}.\nMinta petugas cek kotak masuk / folder Spam.`);
@@ -4148,7 +4182,7 @@ var qrcode = function() {
                     const clash = state.participants.find(p => p.qrCode && p.qrCode === p0.qrCode);
                     if (clash) { alert(`⛔ Tidak bisa dikembalikan: kode tiket ${p0.qrCode} sekarang dipakai oleh ${clash.name}.`); return; }
                     const hasWin = recs.drawWinners && Object.keys(recs.drawWinners).length;
-                    if (!confirm(`Kembalikan peserta ${p0.name} beserta seluruh datanya seperti semula?${hasWin ? '\n\n⚠️ Termasuk catatan pemenang undian. Bila hadiahnya sudah diundi ulang ke orang lain, periksa peringatan "undian ganda" di tab Undian.' : ''}`)) return;
+                    if (!await askConfirm(`Kembalikan peserta ${p0.name} beserta seluruh datanya seperti semula?${hasWin ? '\n\n⚠️ Termasuk catatan pemenang undian. Bila hadiahnya sudah diundi ulang ke orang lain, periksa peringatan "undian ganda" di tab Undian.' : ''}`)) return;
                     const upd = {};
                     Object.entries(recs).forEach(([n, m]) => Object.entries(m || {}).forEach(([k, v]) => { upd[n + '/' + k] = v; }));
                     upd['cancelLog/' + id + '/restoredAt'] = Date.now();
@@ -4159,7 +4193,7 @@ var qrcode = function() {
                 }
                 if ((state[x.type] || []).some(r => r.participantId === x.participantId)) { alert('Peserta ini sudah tercatat lagi, tidak perlu dikembalikan.'); window.loadCancelLog(); return; }
                 const t = CX_TYPES[x.type] || { label: x.type };
-                if (!confirm(`Kembalikan ${t.label} ${x.name} seperti semula?`)) return;
+                if (!await askConfirm(`Kembalikan ${t.label} ${x.name} seperti semula?`)) return;
                 const upd = {};
                 const [k, rec] = Object.entries(x.records || {})[0] || [];
                 if (!k) return;
@@ -4341,7 +4375,7 @@ var qrcode = function() {
             if (!isAdmin()) return;
             if (!requireOnline(open ? 'Membuka pendaftaran' : 'Menutup pendaftaran')) return;
             const r = state.regSettings || {};
-            if (!open && !confirm('Tutup pendaftaran sekarang?\n\nJemaat tidak bisa mendaftar sendiri lagi. Panitia yang login tetap bisa mendaftarkan peserta (mis. tamu yang datang langsung).')) return;
+            if (!open && !await askConfirm('Tutup pendaftaran sekarang?\n\nJemaat tidak bisa mendaftar sendiri lagi. Panitia yang login tetap bisa mendaftarkan peserta (mis. tamu yang datang langsung).')) return;
             const patch = { open };
             // Membuka kembali setelah jadwal tutup lewat -> jadwal lama dihapus
             if (open && r.closeAt && Date.now() >= r.closeAt) patch.closeAt = null;
@@ -4355,7 +4389,7 @@ var qrcode = function() {
             if (v) {
                 closeAt = new Date(v).getTime();
                 if (!Number.isFinite(closeAt)) { alert('Format tanggal/jam tidak valid.'); return; }
-                if (closeAt <= Date.now() && !confirm('Waktu tutup otomatis sudah lewat, jadi pendaftaran akan langsung tertutup. Lanjutkan?')) return;
+                if (closeAt <= Date.now() && !await askConfirm('Waktu tutup otomatis sudah lewat, jadi pendaftaran akan langsung tertutup. Lanjutkan?')) return;
             }
             const btn = document.getElementById('regSaveBtn'); if (btn) btn.disabled = true;
             try {
@@ -4596,7 +4630,7 @@ var qrcode = function() {
             if (!isAdmin() || !requireOnline('Menghapus hadiah')) return;
             const x = prizeById(id); if (!x) return;
             const n = prizeWinners(id).length;
-            if (!confirm(`Hapus "${x.name}" dari daftar hadiah?` + (n ? `\n\n⚠️ Hadiah ini sudah dimenangkan ${n} orang. Nama hadiah tetap tercatat di data pemenang, tetapi tidak lagi dihitung di daftar.` : ''))) return;
+            if (!await askConfirm(`Hapus "${x.name}" dari daftar hadiah?` + (n ? `\n\n⚠️ Hadiah ini sudah dimenangkan ${n} orang. Nama hadiah tetap tercatat di data pemenang, tetapi tidak lagi dihitung di daftar.` : ''))) return;
             try { await db.ref('prizes/' + id).set(null); if (state.pmEditId === id) state.pmEditId = null; window.renderPrizesModal(); }
             catch (e) { alert(authErrMsg(e)); }
         };
@@ -4660,7 +4694,7 @@ var qrcode = function() {
                 alert(`⛔ Tidak bisa dibatalkan: stok "${pz.name}" sudah dipakai pemenang pengganti.\n\nTambah jumlah hadiah ini di Daftar Hadiah bila memang ingin mengembalikan ${w.name}.`);
                 return;
             }
-            if (!confirm(`Batalkan status HANGUS untuk ${w.name}?\n\n${w.name} kembali menjadi pemenang${pz ? ' ' + pz.name : ''} dan bisa mengambil hadiahnya.`)) return;
+            if (!await askConfirm(`Batalkan status HANGUS untuk ${w.name}?\n\n${w.name} kembali menjadi pemenang${pz ? ' ' + pz.name : ''} dan bisa mengambil hadiahnya.`)) return;
             try {
                 state.outbox = state.outbox.filter(it => !(it.node === 'drawForfeits' && it.key === key)); saveOutbox();
                 await db.ref('drawForfeits/' + key).set(null);
@@ -4809,7 +4843,7 @@ var qrcode = function() {
                 return true;
             } catch (e) {
                 console.error(e);
-                return confirm('⚠️ Backup otomatis GAGAL dibuat:\n' + authErrMsg(e) + '\n\nTetap lanjutkan TANPA backup? (Tidak disarankan)');
+                return await askConfirm('⚠️ Backup otomatis GAGAL dibuat:\n' + authErrMsg(e) + '\n\nTetap lanjutkan TANPA backup? (Tidak disarankan)');
             }
         };
 
@@ -4888,7 +4922,7 @@ var qrcode = function() {
             if (!requireOnline('Hapus backup')) return;
             const b = state.backups.find(x => x.id === id);
             if (!b) return;
-            if (!confirm(`Hapus backup ${b.createdAtText || ''}?\n"${b.reason}"\n\nBackup yang dihapus tidak bisa dikembalikan.`)) return;
+            if (!await askConfirm(`Hapus backup ${b.createdAtText || ''}?\n"${b.reason}"\n\nBackup yang dihapus tidak bisa dikembalikan.`)) return;
             try {
                 const upd = {}; upd['backups/' + id] = null; upd['backupIndex/' + id] = null;
                 await db.ref().update(upd);
@@ -5324,9 +5358,9 @@ var qrcode = function() {
             obj[key] = !!on;
             saveDrawClasses(obj);
         };
-        window.resetDrawClassDefault = () => {
+        window.resetDrawClassDefault = async () => {
             if (!isAdmin()) return;
-            if (!confirm('Kembalikan pilihan kelas undian ke bawaan?\n(Semua Kelas, Kelas Pagi & Umum dinonaktifkan)')) return;
+            if (!await askConfirm('Kembalikan pilihan kelas undian ke bawaan?\n(Semua Kelas, Kelas Pagi & Umum dinonaktifkan)')) return;
             saveDrawClasses(Object.assign({}, DRAW_CLASS_DEFAULT));
         };
         // ========================================================================
@@ -6224,7 +6258,7 @@ var qrcode = function() {
         const acquireDrawLock = async () => {
             if (!state.online) {
                 if (!state.offlineDrawOk) {
-                    if (!confirm('📴 Anda sedang OFFLINE.\n\nSaat offline, aplikasi tidak bisa memastikan tidak ada perangkat lain yang sedang mengundi.\nPastikan HANYA perangkat ini yang dipakai untuk undian.\n\nLanjutkan mengundi?')) return false;
+                    if (!await askConfirm('📴 Anda sedang OFFLINE.\n\nSaat offline, aplikasi tidak bisa memastikan tidak ada perangkat lain yang sedang mengundi.\nPastikan HANYA perangkat ini yang dipakai untuk undian.\n\nLanjutkan mengundi?')) return false;
                     state.offlineDrawOk = true;
                 }
                 return true;
@@ -7318,7 +7352,7 @@ var qrcode = function() {
             const typed = prompt(warningText);
             if (typed === null) return;
             if (typed.trim().toUpperCase() !== 'HAPUS') { alert("Dibatalkan. Teks konfirmasi tidak sesuai."); return; }
-            if (!confirm("Apakah Anda YAKIN ingin menghapus SEMUA data?\n\nSistem akan membuat backup otomatis dulu, jadi data masih bisa dipulihkan dari menu Backup.")) return;
+            if (!await askConfirm("Apakah Anda YAKIN ingin menghapus SEMUA data?\n\nSistem akan membuat backup otomatis dulu, jadi data masih bisa dipulihkan dari menu Backup.")) return;
             if (!(await safetyBackup('Otomatis: sebelum Hapus Seluruh Database'))) return;
 
             Promise.all([
